@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JEEINGO – Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark'}catch(e){}</script>
+<style>
+  :root { color-scheme:dark; --bg:#07080c; --card:rgba(255,255,255,.055); --line:rgba(255,255,255,.1); --fg:#f3f1ec; --muted:#9a9db0; --grid:rgba(255,255,255,.05); --inp:rgba(0,0,0,.35); }
+  [data-theme=light] { color-scheme:light; --bg:#f4f1ea; --card:rgba(255,255,255,.8); --line:rgba(20,22,42,.1); --fg:#15172b; --muted:#666a80; --grid:rgba(20,22,42,.06); --inp:#fff; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; background:var(--bg); color:var(--fg); font:15px/1.5 "Plus Jakarta Sans", system-ui, sans-serif; overflow:hidden; }
+  .bg { position:fixed; inset:0; z-index:-1; pointer-events:none; }
+  .bg .grid { position:absolute; inset:0; background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px); background-size:56px 56px; -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 45%,#000 20%,transparent 78%); mask-image:radial-gradient(ellipse 70% 60% at 50% 45%,#000 20%,transparent 78%); }
+  .orb { position:absolute; border-radius:50%; filter:blur(110px); }
+  .o1 { width:50vmax; height:50vmax; left:-16vmax; top:-24vmax; background:#4a55ff; opacity:.3; }
+  .o2 { width:42vmax; height:42vmax; right:-14vmax; bottom:-20vmax; background:#c04bff; opacity:.2; }
+  .o3 { width:30vmax; height:30vmax; left:30vw; bottom:-16vmax; background:#e8a05a; opacity:.14; }
+  [data-theme=light] .o1 { opacity:.2; } [data-theme=light] .o2 { opacity:.14; } [data-theme=light] .o3 { opacity:.2; }
+  form { position:relative; width:min(380px,92vw); padding:34px 30px 30px; border-radius:26px; background:var(--card); border:1px solid var(--line); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); box-shadow:0 40px 90px -40px rgba(60,70,255,.55); display:grid; gap:14px; animation:rise .6s cubic-bezier(.2,.8,.2,1); }
+  @keyframes rise { from { opacity:0; transform:translateY(18px) scale(.98); } }
+  .mark { width:54px; height:54px; border-radius:16px; display:grid; place-items:center; background:linear-gradient(135deg,#6366f1,#a855f7 60%,#ec4899); box-shadow:0 14px 30px -10px rgba(120,90,255,.8); }
+  .mark svg { width:26px; height:26px; color:#fff; }
+  .logo { font:800 30px/1 Sora, sans-serif; letter-spacing:1.5px; background:linear-gradient(90deg,#8b97ff,#c084fc,#ff9ec4,#f3c283); -webkit-background-clip:text; background-clip:text; color:transparent; margin-top:6px; }
+  p { margin:0; color:var(--muted); }
+  .field { position:relative; }
+  .field svg { position:absolute; left:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--muted); }
+  input, button { font:inherit; width:100%; border-radius:14px; }
+  input { padding:14px 14px 14px 42px; border:1px solid var(--line); background:var(--inp); color:var(--fg); outline:none; transition:border-color .15s, box-shadow .15s; }
+  input:focus { border-color:#7c8cff; box-shadow:0 0 0 4px rgba(124,140,255,.18); }
+  button { padding:14px; border:0; color:#fff; cursor:pointer; font-weight:700; letter-spacing:.3px; background:linear-gradient(90deg,#5b6cff,#a04bff); box-shadow:0 14px 30px -12px rgba(110,90,255,.9); transition:transform .15s, filter .15s; }
+  button:hover { transform:translateY(-2px); filter:brightness(1.08); }
+  #err { color:#ff7b8a; display:none; font-size:14px; }
+  .note { font-size:12.5px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="bg"><div class="grid"></div><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<form method="post" action="/login" id="f">
+  <div class="mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z"/></svg></div>
+  <div class="logo">JEEINGO</div>
+  <p>Welcome back. Enter the access password to start learning.</p>
+  <div class="field">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+    <input type="password" name="password" placeholder="Access password" required autofocus autocomplete="current-password">
+  </div>
+  <button>Enter JEEINGO</button>
+  <div id="err">Wrong password. Please try again.</div>
+  <p class="note">You will be asked for the password every time you reopen the site.</p>
+</form>
+<script>
+  if (location.search.includes('bad=1')) document.getElementById('err').style.display = 'block';
+  document.getElementById('f').addEventListener('submit', () => { try { sessionStorage.setItem('jg', '1'); } catch (e) {} });
+</script>
+</body>
+</html>

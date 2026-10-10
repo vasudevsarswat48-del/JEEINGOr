@@ -1,0 +1,112 @@
+[
+  {
+    "slug": "pratham",
+    "name": "Pratham",
+    "description": "Full 2-year integrated course for Class 11 students covering the complete JEE syllabus from fundamentals to Advanced level.",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1004416967258"},
+      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004394385972"},
+      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004480061221"},
+      {"slug": "maths", "name": "Maths", "channel": "-1004462336439"}
+    ]
+  },
+  {
+    "slug": "prakhar",
+    "name": "Prakhar",
+    "description": "1-year comprehensive batch for Class 12 students covering Class 12 syllabus.",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1004409112025"},
+      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1003978695355"},
+      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004326230759"},
+      {"slug": "maths", "name": "Maths", "channel": "-1003870779366"}
+    ]
+  },
+
+  {
+    "slug": "praveen",
+    "name": "Praveen",
+    "description": "Full-year target program specifically for droppers / Class 12 pass-outs.",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1004493217591"},
+      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004485228413"},
+      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004293277834"},
+      {"slug": "maths", "name": "Maths", "channel": "-1004495116170"}
+    ]
+  },
+
+  {
+    "slug": "fastlane",
+    "name": "Praveen-Fastlane",
+    "description": "Accelerated, high-intensity variant of Praveen designed to finish the syllabus early (by December).",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1004387664018"},
+      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004330524716"},
+      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1003908875054"},
+      {"slug": "maths", "name": "Maths", "channel": "-1004451556448"}
+    ]
+  },
+
+  {
+    "slug": "champ",
+    "name": "CHAMP",
+    "description": "Specialized rank-enhancement program focused on short-notes revision, problem-solving techniques, and concept clearing ahead of JEE Main.",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1003979718188"},
+      {"slug": "chemistry", "name": "Chemistry", "channel": "-1004379772741"},
+      {"slug": "maths", "name": "Maths", "channel": "-1004410682141"}
+    ]
+  },
+
+  {
+    "slug": "ccube",
+    "name": "C³-Competishun Crash Course",
+    "description": "Fast-paced revision crash course focusing on high-yield concepts and question-solving for upcoming JEE Main sessions.",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1004487052681", "name_line": 2},
+      {"slug": "chemistry", "name": "Chemistry", "channel": "-1004421740493", "name_line": 2},
+      {"slug": "maths", "name": "Maths", "channel": "-1003980064478", "name_line": 2}
+    ]
+  },
+
+  {
+    "slug": "pragyaanm",
+    "name": "Pragyaan-Mains",
+    "description": "Dedicated 1-year batch tailored strictly for JEE Main aspirants, featuring structured daily schedules and mapped problem sheets.",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1003989544657", "name_line": 2},
+      {"slug": "chemistry", "name": "Chemistry", "channel": "-1004335527806", "name_line": 2},
+      {"slug": "maths", "name": "Maths", "channel": "-1004327161890", "name_line": 2}
+    ]
+  },
+  {
+    "slug": "abc",
+    "name": "ABC Batch",
+    "description": "Advanced problem-solving and score-booster programs focused on sharpening speed, accuracy, and test-taking strategy.",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1003773795128", "name_line": 2},
+      {"slug": "chemistry", "name": "Chemistry", "channel": "-1003960126036", "name_line": 2},
+      {"slug": "maths", "name": "Maths", "channel": "-1004385194729", "name_line": 2}
+    ]
+  },
+
+  {
+    "slug": "cats",
+    "name": "CATS",
+    "description": "Post-JEE Main batch tailored exclusively for JEE Advanced preparation through high-level problem solving, mock tests, and Advanced PYQs.",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1004338965736"},
+      {"slug": "chemistry", "name": "Chemistry", "channel": "-1004365808063"},
+      {"slug": "maths", "name": "Maths", "channel": "-1004398967014"}
+    ]
+  },
+  {
+    "slug": "cats+",
+    "name": "CATS-Plus",
+    "description": "CATS Plus is an upgraded version of the regular CATS batch designed specifically for JEE Advanced.",
+    "subjects": [
+      {"slug": "physics", "name": "Physics", "channel": "-1004304979287"},
+      {"slug": "chemistry", "name": "Chemistry", "channel": "-1004324770050"},
+      {"slug": "maths", "name": "Maths", "channel": "-1004335667621"}
+    ]
+  }
+]

@@ -72,6 +72,10 @@
   .tg { display:inline-flex; align-items:center; gap:10px; padding:10px 20px; border-radius:13px; background:#fff; color:#1b2238; font-weight:700; border:1px solid #e6e8ee; box-shadow:0 12px 30px -14px rgba(90,110,255,.7); transition:transform .15s, box-shadow .15s; }
   .tg:hover { transform:translateY(-2px); box-shadow:0 18px 34px -14px rgba(90,110,255,.9); }
   .tg svg { width:19px; height:19px; flex:none; }
+  .topright { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+  .ts { display:inline-flex; align-items:center; gap:9px; padding:10px 20px; border-radius:13px; color:#fff; font-weight:700; background:linear-gradient(90deg,#5b6cff,#a04bff 60%,#ec4899); box-shadow:0 12px 30px -14px rgba(130,90,255,.9); transition:transform .15s, filter .15s; }
+  .ts:hover { transform:translateY(-2px); filter:brightness(1.08); }
+  .ts svg { width:18px; height:18px; flex:none; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 
   /* ---------- hero ---------- */
   .hero { position:relative; text-align:center; padding:34px 0 46px; }
@@ -112,6 +116,31 @@
   .arrow { width:36px; height:36px; border-radius:50%; background:var(--card2); border:1px solid var(--line); display:grid; place-items:center; transition:transform .25s, background .25s, color .25s; }
   .arrow .svg { width:16px; height:16px; }
   .box:hover .arrow { transform:translateX(4px); background:#fff; color:#111426; }
+
+  /* ---------- locked batch ---------- */
+  .lk { display:inline-block; width:14px; height:14px; vertical-align:-2px; margin-right:7px; }
+  .lk .svg { width:14px; height:14px; }
+  .lockwrap { min-height:58vh; display:grid; place-items:center; }
+  .lockcard { width:min(430px,100%); text-align:center; padding:38px 30px 30px; border-radius:28px; background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); }
+  .lockcard .tile { margin:0 auto 20px; width:70px; height:70px; }
+  .lockcard .tile .svg { width:32px; height:32px; }
+  .lockcard h2 { font:700 25px/1.25 var(--fh); margin:0 0 8px; letter-spacing:-.3px; }
+  .lockcard p { color:var(--muted); margin:0 0 22px; }
+  .lockcard input { width:100%; padding:14px 16px; border-radius:14px; border:1px solid var(--line); background:var(--inp); outline:none; text-align:center; font-size:16px; letter-spacing:1.5px; transition:border-color .15s, box-shadow .15s; }
+  .lockcard input:focus { border-color:var(--accent); box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent); }
+  .lockcard .btn { width:100%; margin-top:12px; padding:14px; font-size:15px; }
+  .lockerr { color:#ff7b8a; font-size:14px; min-height:20px; margin-top:12px; }
+  @keyframes shake { 20%,60% { transform:translateX(-8px); } 40%,80% { transform:translateX(8px); } }
+  .shake { animation:shake .38s; }
+
+  /* ---------- chapter boxes ---------- */
+  .tile.n { font:800 29px/1 var(--fh); letter-spacing:-.5px; }
+  .pill { font-size:12px; font-weight:700; letter-spacing:.3px; padding:6px 13px; border-radius:99px; background:var(--pill); border:1px solid var(--line); color:var(--soft); white-space:nowrap; }
+  .prog { height:5px; border-radius:9px; background:var(--card2); overflow:hidden; margin-top:18px; }
+  .prog i { display:block; height:100%; border-radius:9px; background:linear-gradient(90deg,var(--c1),var(--c2)); }
+  .box.soon { opacity:.62; }
+  .box.chap { min-height:224px; }
+  .eyebrow2 { display:inline-block; margin-bottom:10px; }
 
   /* ---------- search/bar ---------- */
   .bar { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 22px; }
@@ -179,7 +208,7 @@
 
   @media (max-width:980px) { .watch { grid-template-columns:1fr; } .playlist { position:static; } #plist { max-height:60vh; } }
   @media (max-width:700px) { .crumbs { display:none; } header { padding:11px 14px; } .themebtn { margin-left:auto; } }
-  @media (max-width:560px) { main { padding:16px 12px 56px; } .boxes { grid-template-columns:1fr; } .vgrid { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; } .tg, .back { padding:9px 14px; } .vinfo { padding:16px; } .hero { padding:18px 0 34px; } .vth .vn { font-size:28px; } }
+  @media (max-width:560px) { main { padding:16px 12px 56px; } .boxes { grid-template-columns:1fr; } .vgrid { grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; } .tg, .ts, .back { padding:9px 14px; } .vinfo { padding:16px; } .hero { padding:18px 0 34px; } .vth .vn { font-size:28px; } }
   @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation:none !important; transition:none !important; } }
 </style>
 </head>
@@ -208,6 +237,10 @@
    Example: "https://t.me/jeeingo_discussion"
    Leave it as "" to hide the Join Telegram button.                          */
 const TELEGRAM_LINK = "https://t.me/jeeingo";
+
+/* Link of your Test Series website (the Next.js app), e.g. "https://jeeingo-tests.netlify.app"
+   Leave it as "" to hide the Join Test Series button.                       */
+const TEST_SERIES_LINK = "https://jeeingotests.netlify.app/";
 /* =================================== */
 
 /* ---- ask for the password every time the site is reopened ----
@@ -231,12 +264,13 @@ const store = {
 const fmtDur = s => { if (!s) return ''; const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60;
   return (h? h+':'+String(m).padStart(2,'0') : m)+':'+String(x).padStart(2,'0'); };
 const fmtSize = b => !b ? '' : b > 1e9 ? (b/1e9).toFixed(2)+' GB' : (b/1e6).toFixed(0)+' MB';
-const api = async u => { const r = await fetch(u); if (r.status === 401) { location = '/login'; throw 0; } if (!r.ok) throw new Error(r.status); return r.json(); };
+const api = async u => { const r = await fetch(u); if (r.status === 401) { location = '/login'; throw 0; } if (!r.ok) { const e = new Error(r.status); e.status = r.status; throw e; } return r.json(); };
 const pkey = (b,s,id) => `p:${b}:${s}:${id}`;
 const skel = n => '<div class="skel"></div>'.repeat(n);
 
 /* ---------- icons (line icons, no emoji) ---------- */
 const ICONS = {
+  test: '<rect x="6" y="4" width="12" height="17" rx="2.5"/><path d="M9 4h6v2.5a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/><path d="m9.5 13.5 2 2 3.5-4"/>',
   atom:'<circle cx="12" cy="12" r="1.8" fill="currentColor"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/>',
   flask:'<path d="M9 3h6"/><path d="M10 3v6.2L4.6 18.4A2 2 0 0 0 6.3 21.4h11.4a2 2 0 0 0 1.7-3L14 9.2V3"/><path d="M7.4 15h9.2"/>',
   sigma:'<path d="M18 5H6.5l6 7-6 7H18"/>',
@@ -251,6 +285,7 @@ const ICONS = {
   back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
   play:'<path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor" stroke="none"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  lock:'<rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor"/>',
 };
 const svg = k => `<svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]}</svg>`;
 const BATCH_ICONS = ['cap','rocket','target','trophy'];
@@ -263,15 +298,24 @@ function iconFor(name, slug, given, i = 0) {
   return svg(k);
 }
 
-const cache = { details:{}, videos:{} };
+const cache = { details:{}, videos:{}, chapters:{} };
 const getDetail = async b => cache.details[b] ||= await api(`/api/batches/${enc(b)}`);
-const getVideos = async (b, s) => {
-  const k = `${b}/${s}`, c = cache.videos[k];
-  if (c && Date.now() - c.t < 300000) return c.v;   // refresh every 5 minutes
-  const v = (await api(`/api/batches/${enc(b)}/subjects/${enc(s)}/videos?limit=5000`)).videos;
-  cache.videos[k] = { t: Date.now(), v };
-  return v;
+const fresh = h => h && Date.now() - h.t < 300000;   // refresh every 5 minutes
+const getVideos = async (b, s, c) => {
+  const k = `${b}/${s}/${c || ''}`, h = cache.videos[k];
+  if (fresh(h)) return h.r;
+  const r = await api(`/api/batches/${enc(b)}/subjects/${enc(s)}/videos?limit=5000` + (c ? `&chapter=${enc(c)}` : ''));
+  cache.videos[k] = { t: Date.now(), r };
+  return r;
 };
+const getChapters = async (b, s) => {
+  const k = `${b}/${s}`, h = cache.chapters[k];
+  if (fresh(h)) return h.r;
+  const r = await api(`/api/batches/${enc(b)}/subjects/${enc(s)}/chapters`);
+  cache.chapters[k] = { t: Date.now(), r };
+  return r;
+};
+const fmtLong = x => { if (!x) return ''; const h = Math.floor(x/3600), m = Math.round(x%3600/60); return h ? `${h}h ${m}m` : `${m}m`; };
 
 function crumbs(parts) {
   $('crumbs').innerHTML = parts.map(p => p.href ? `<a href="${p.href}">${esc(p.label)}</a>` : `<span class="cur">${esc(p.label)}</span>`).join('<span>›</span>');
@@ -287,15 +331,18 @@ $('theme').onclick = () => {
 /* ---------- Back + Join Telegram ---------- */
 const TG_SVG = `<svg viewBox="0 0 24 24" fill="#1f2a44" stroke="#1f2a44" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13" stroke="#fff" stroke-width="1.6"/></svg>`;
 const tgBtn = () => TELEGRAM_LINK ? `<a class="tg" href="${esc(TELEGRAM_LINK)}" target="_blank" rel="noopener noreferrer">${TG_SVG}<span>Join Telegram</span></a>` : '';
+const tsBtn = () => TEST_SERIES_LINK ? `<a class="ts" href="${esc(TEST_SERIES_LINK)}" target="_blank" rel="noopener noreferrer">${svg('test')}<span>Join Test Series</span></a>` : '';
 const backBtn = (href, label = 'Back') => href ? `<a class="back" href="${href}">${svg('back')}${label}</a>` : '<span></span>';
-const topbar = (back, withTg = true, label) => `<div class="topbar">${backBtn(back, label)}${withTg ? tgBtn() : ''}</div>`;
+const topbar = (back, withTg = true, label) => `<div class="topbar">${backBtn(back, label)}${withTg ? `<div class="topright">${tgBtn()}${tsBtn()}</div>` : ''}</div>`;
 
 /* ---------- routing ----------
- #/                       batches
- #/b/B                    subjects
- #/b/B/s/S                all lectures (grid)
- #/b/B/s/S/v/ID           player + side playlist            */
-let W = null, R = 0;
+ #/                          batches
+ #/b/B                       subjects
+ #/b/B/s/S                   chapter boxes (if the subject has chapters) or all lectures
+ #/b/B/s/S/c/C               lectures of one chapter
+ #/b/B/s/S/v/ID              player (subject without chapters)
+ #/b/B/s/S/c/C/v/ID          player (chapter)                   */
+let W = null, R = 0, batchList = null;
 function parseHash() {
   const p = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   const o = {};
@@ -308,10 +355,53 @@ function route() {
   const watching = o.b && o.s && o.v;
   if (!watching) W = null;
   window.scrollTo(0, 0);
-  if (watching) return watchPage(o.b, o.s, +o.v, tok);
-  if (o.b && o.s) return lecturesPage(o.b, o.s, tok);
-  if (o.b) return batchPage(o.b, tok);
+  if (o.b) return checkLock(o.b, tok).then(ok => { if (ok) dispatch(o, tok, watching); });
   return home(tok);
+}
+function dispatch(o, tok, watching) {
+  if (watching) return watchPage(o.b, o.s, +o.v, tok, o.c || null);
+  if (o.b && o.s && o.c) return lecturesPage(o.b, o.s, tok, o.c);
+  if (o.b && o.s) return subjectPage(o.b, o.s, tok);
+  return batchPage(o.b, tok);
+}
+
+/* ---------- batch password ---------- */
+async function checkLock(b, tok) {
+  try { await getDetail(b); return tok === R; }
+  catch (e) {
+    if (e.status === 403) { if (tok === R) lockPage(b, tok); return false; }
+    return tok === R;          // other errors: the page itself shows "not found"
+  }
+}
+
+async function lockPage(b, tok) {
+  crumbs([{label:'Home', href:'#/'}, {label:'Locked batch'}]);
+  let name = 'This batch';
+  try { batchList ||= await api('/api/batches'); const x = batchList.find(z => z.slug === b); if (x) name = x.name; } catch {}
+  if (tok !== R) return;
+  document.title = `${name} – JEEINGO`;
+  $('main').innerHTML = topbar('#/') + `<div class="lockwrap"><form class="lockcard" id="lf" style="${cv(b)}">
+      <div class="tile">${svg('lock')}</div>
+      <h2>${esc(name)}</h2>
+      <p>This batch is password protected.<br>Enter the batch password to continue.</p>
+      <input id="lp" type="password" placeholder="Batch password" autocomplete="off" required>
+      <button class="btn pri" type="submit" id="lb">Unlock batch</button>
+      <div class="lockerr" id="le"></div>
+    </form></div>`;
+  $('lp').focus();
+  $('lf').onsubmit = async e => {
+    e.preventDefault();
+    $('lb').disabled = true; $('le').textContent = '';
+    try {
+      const r = await fetch(`/api/batches/${enc(b)}/unlock`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password: $('lp').value }) });
+      if (r.status === 401) { location = '/login'; return; }
+      if (r.ok) { delete cache.details[b]; route(); return; }
+      $('le').textContent = r.status === 429 ? 'Too many attempts. Please wait a few minutes.' : 'Wrong password. Please try again.';
+      $('lf').classList.remove('shake'); void $('lf').offsetWidth; $('lf').classList.add('shake');
+      $('lp').select();
+    } catch { $('le').textContent = 'Network error. Please try again.'; }
+    $('lb').disabled = false;
+  };
 }
 if (!BLOCKED) { window.addEventListener('hashchange', route); route(); }
 
@@ -329,6 +419,7 @@ async function home(tok) {
   let bs;
   try { bs = await api('/api/batches'); } catch { if (tok === R) $('boxes').innerHTML = '<div class="empty">Could not load. Please refresh the page.</div>'; return; }
   if (tok !== R) return;
+  batchList = bs;
   const subs = bs.reduce((a, b) => a + b.subject_count, 0);
   $('stats').innerHTML = `<div><b>${bs.length}</b><span>BATCH${bs.length>1?'ES':''}</span></div><div><b>${subs}</b><span>SUBJECT${subs>1?'S':''}</span></div><div><b>24×7</b><span>ACCESS</span></div>`;
   $('boxes').innerHTML = bs.length ? bs.map((b, i) => `
@@ -336,7 +427,7 @@ async function home(tok) {
       <div class="pat ${pat(b.slug)}"></div>
       <div><div class="row"><div class="tile">${iconFor(b.name, b.slug, b.icon, i)}</div><div class="idx">${String(i+1).padStart(2,'0')}</div></div>
       <div class="nm">${esc(b.name)}</div><div class="ds">${esc(b.description)}</div></div>
-      <div class="ft"><b>${b.subject_count} subject${b.subject_count>1?'s':''}</b><span class="arrow">${svg('arrow')}</span></div>
+      <div class="ft"><b>${b.locked ? `<span class="lk">${svg('lock')}</span>` : ''}${b.subject_count} subject${b.subject_count>1?'s':''}</b><span class="arrow">${svg('arrow')}</span></div>
     </a>`).join('') : '<div class="empty">No batches yet.</div>';
 }
 
@@ -352,37 +443,85 @@ async function batchPage(b, tok) {
     <a class="box" href="#/b/${enc(b)}/s/${enc(s.slug)}" style="${cv(s.slug + s.name)};animation-delay:${i*70}ms">
       <div class="pat ${pat(s.slug + s.name)}"></div>
       <div><div class="row"><div class="tile">${iconFor(s.name, s.slug, s.icon, i)}</div><div class="idx">${String(i+1).padStart(2,'0')}</div></div>
-      <div class="nm">${esc(s.name)}</div><div class="ds">${esc(s.description) || 'All lectures, in order.'}</div></div>
-      <div class="ft"><b>View lectures</b><span class="arrow">${svg('arrow')}</span></div>
+      <div class="nm">${esc(s.name)}</div><div class="ds">${esc(s.description) || (s.has_chapters ? 'Chapter-wise lectures.' : 'All lectures, in order.')}</div></div>
+      <div class="ft"><b>${s.has_chapters ? 'View chapters' : 'View lectures'}</b><span class="arrow">${svg('arrow')}</span></div>
     </a>`).join('') + '</div>';
 }
 
-/* ---------- subject: all lectures ---------- */
-async function lecturesPage(b, s, tok) {
+/* ---------- subject: chapter boxes (only for subjects that have "chapters" in batches.json) ---------- */
+function chapBox(b, s, c, i) {
+  const done = c.video_ids.filter(id => (store.get(pkey(b, s, id)) || {}).done).length;
+  const pct = c.count ? Math.round(done / c.count * 100) : 0;
+  return `<a class="box chap${c.count ? '' : ' soon'}" href="#/b/${enc(b)}/s/${enc(s)}/c/${enc(c.id)}" style="${cv(s + c.id)};animation-delay:${Math.min(i, 12)*60}ms">
+    <div class="pat ${pat(s + c.id)}"></div>
+    <div><div class="row"><div class="tile n">${c.num ?? '···'}</div><span class="pill">${c.count ? c.count + ' lecture' + (c.count > 1 ? 's' : '') : 'Coming soon'}</span></div>
+      <div class="nm">${esc(c.name)}</div>
+      <div class="ds">${c.duration ? fmtLong(c.duration) + ' of lectures' : '&nbsp;'}</div></div>
+    <div><div class="prog"><i style="width:${pct}%"></i></div>
+      <div class="ft"><b>${done ? done + ' of ' + c.count + ' watched' : (c.count ? 'Start learning' : 'No lectures yet')}</b><span class="arrow">${svg('arrow')}</span></div></div>
+  </a>`;
+}
+
+async function subjectPage(b, s, tok) {
   let d;
   try { d = await getDetail(b); } catch { if (tok === R) $('main').innerHTML = topbar('#/') + '<div class="empty">Batch not found.</div>'; return; }
   if (tok !== R) return;
   const subj = d.subjects.find(x => x.slug === s);
   const back = `#/b/${enc(b)}`;
   if (!subj) { $('main').innerHTML = topbar(back) + '<div class="empty">Subject not found.</div>'; return; }
+  if (!subj.has_chapters) return lecturesPage(b, s, tok, null);   // no chapters: straight to the lectures
 
   document.title = `${subj.name} – ${d.name} – JEEINGO`;
   crumbs([{label:'Home', href:'#/'}, {label:d.name, href:back}, {label:subj.name}]);
+  $('main').innerHTML = topbar(back) + `<div class="sechead"><div><h2>${esc(subj.name)}</h2><p>Loading chapters… the first load can take a few seconds.</p></div></div><div class="boxes">${skel(6)}</div>`;
+
+  let data;
+  try { data = await getChapters(b, s); } catch { if (tok === R) $('main').innerHTML = topbar(back) + '<div class="empty">Could not load chapters. Please refresh.</div>'; return; }
+  if (tok !== R) return;
+  const chs = data.chapters;
+  $('main').innerHTML = topbar(back) + `<div class="sechead"><div><h2>${esc(subj.name)}</h2><p>${chs.length} chapter${chs.length === 1 ? '' : 's'} · ${data.total} lectures</p></div>
+      ${chs.length > 8 ? `<div class="bar" style="margin:0"><div class="sbox">${svg('search')}<input id="cq" type="search" placeholder="Search chapters…"></div></div>` : ''}</div>
+    <div class="rule"></div><div class="boxes" id="chs"></div>`;
+  const draw = () => {
+    const q = $('cq') ? $('cq').value.trim().toLowerCase() : '';
+    const html = chs.map((c, i) => ({c, i})).filter(x => !q || x.c.name.toLowerCase().includes(q)).map(({c, i}) => chapBox(b, s, c, i)).join('');
+    $('chs').innerHTML = html || '<div class="empty">No chapters match.</div>';
+  };
+  if ($('cq')) $('cq').oninput = draw;
+  draw();
+}
+
+/* ---------- lectures grid (whole subject, or one chapter when c is given) ---------- */
+async function lecturesPage(b, s, tok, c) {
+  let d;
+  try { d = await getDetail(b); } catch { if (tok === R) $('main').innerHTML = topbar('#/') + '<div class="empty">Batch not found.</div>'; return; }
+  if (tok !== R) return;
+  const subj = d.subjects.find(x => x.slug === s);
+  const back = c ? `#/b/${enc(b)}/s/${enc(s)}` : `#/b/${enc(b)}`;
+  if (!subj) { $('main').innerHTML = topbar(back) + '<div class="empty">Subject not found.</div>'; return; }
+
+  document.title = `${subj.name} – ${d.name} – JEEINGO`;
+  const base = [{label:'Home', href:'#/'}, {label:d.name, href:`#/b/${enc(b)}`}];
+  crumbs(c ? [...base, {label:subj.name, href:back}] : [...base, {label:subj.name}]);
   $('main').innerHTML = topbar(back) + `<div class="sechead"><div><h2>${esc(subj.name)}</h2><p>Loading lectures… the first load can take a few seconds.</p></div></div><div class="vgrid">${skel(8)}</div>`;
 
-  let list;
-  try { list = await getVideos(b, s); } catch { if (tok === R) $('main').innerHTML = topbar(back) + '<div class="empty">Could not load lectures. Please refresh.</div>'; return; }
+  let r;
+  try { r = await getVideos(b, s, c); } catch { if (tok === R) $('main').innerHTML = topbar(back) + '<div class="empty">Could not load lectures. Please refresh.</div>'; return; }
   if (tok !== R) return;
-  if (!list.length) { $('main').innerHTML = topbar(back) + `<div class="sechead"><div><h2>${esc(subj.name)}</h2></div></div><div class="empty">No lectures here yet.</div>`; return; }
+  const list = r.videos;
+  const heading = c ? (r.chapter || 'Lectures') : subj.name;
+  document.title = `${heading} – ${subj.name} – JEEINGO`;
+  if (c) crumbs([...base, {label:subj.name, href:back}, {label:heading}]);
+  const eyebrow = c ? `<span class="chip eyebrow2">${esc(subj.name)}</span><br>` : '';
+  if (!list.length) { $('main').innerHTML = topbar(back) + `<div class="sechead"><div>${eyebrow}<h2>${esc(heading)}</h2></div></div><div class="empty">No lectures here yet.</div>`; return; }
 
-  const C = cv(s + subj.name);
-  $('main').innerHTML = topbar(back) + `<div class="sechead"><div><h2>${esc(subj.name)}</h2><p id="cnt"></p></div>
+  $('main').innerHTML = topbar(back) + `<div class="sechead"><div>${eyebrow}<h2>${esc(heading)}</h2><p id="cnt"></p></div>
       <div class="bar" style="margin:0">
         <div class="sbox">${svg('search')}<input id="vq" type="search" placeholder="Search lectures…"></div>
         <select id="vorder"><option value="old">Oldest first</option><option value="new">Newest first</option></select>
       </div></div>
     <div class="rule"></div>
-    <div class="vgrid" id="vgrid" style="${C}"></div>
+    <div class="vgrid" id="vgrid" style="${cv(s + (c || subj.name))}"></div>
     <button class="btn pri" id="more">Load more</button>`;
 
   const PAGE = 48;
@@ -394,7 +533,7 @@ async function lecturesPage(b, s, tok) {
   };
   const draw = () => {
     const a = filtered();
-    $('vgrid').innerHTML = a.length ? a.slice(0, shown).map((v, i) => lectureCard(b, s, v, i)).join('') : '<div class="empty">No lectures match.</div>';
+    $('vgrid').innerHTML = a.length ? a.slice(0, shown).map((v, i) => lectureCard(b, s, v, i, c)).join('') : '<div class="empty">No lectures match.</div>';
     $('more').style.display = a.length > shown ? 'block' : 'none';
     $('cnt').textContent = `${a.length} lecture${a.length === 1 ? '' : 's'}`;
   };
@@ -404,11 +543,11 @@ async function lecturesPage(b, s, tok) {
   draw();
 }
 
-function lectureCard(b, s, v, i) {
+function lectureCard(b, s, v, i, c) {
   const p = store.get(pkey(b, s, v.id));
   const pct = p && v.duration ? Math.min(100, p.t / v.duration * 100) : 0;
   const n = v.lecture != null ? 'L' + v.lecture : '';
-  return `<a class="vcard" href="#/b/${enc(b)}/s/${enc(s)}/v/${v.id}" style="${cv(s + '-' + (v.lecture ?? v.id))};animation-delay:${Math.min(i, 12)*35}ms">
+  return `<a class="vcard" href="#/b/${enc(b)}/s/${enc(s)}${c ? '/c/' + enc(c) : ''}/v/${v.id}" style="${cv(s + '-' + (v.lecture ?? v.id))};animation-delay:${Math.min(i, 12)*35}ms">
     <div class="vth"><div class="pat p0"></div><div class="vn">${esc(n)}</div>
       <img loading="lazy" onerror="this.remove()" src="/api/batches/${enc(b)}/subjects/${enc(s)}/thumb/${v.id}" alt="">
       <span class="play">${svg('play')}</span>
@@ -421,24 +560,26 @@ function lectureCard(b, s, v, i) {
 }
 
 /* ---------- player + side playlist ---------- */
-async function watchPage(b, s, vid, tok) {
-  if (W && W.b === b && W.s === s && $('v')) { playId(vid); return; }
+async function watchPage(b, s, vid, tok, c = null) {
+  if (W && W.b === b && W.s === s && W.c === c && $('v')) { playId(vid); return; }
   let d;
   try { d = await getDetail(b); } catch { if (tok === R) $('main').innerHTML = topbar('#/') + '<div class="empty">Batch not found.</div>'; return; }
   if (tok !== R) return;
   const subj = d.subjects.find(x => x.slug === s);
-  const back = `#/b/${enc(b)}/s/${enc(s)}`;
+  const subjHref = `#/b/${enc(b)}/s/${enc(s)}`;
+  const back = c ? `${subjHref}/c/${enc(c)}` : subjHref;     // chapter lectures, or the subject page
   if (!subj) { $('main').innerHTML = topbar(`#/b/${enc(b)}`) + '<div class="empty">Subject not found.</div>'; return; }
 
   $('main').innerHTML = topbar(back, false, 'Back to lectures') + '<div class="skel" style="height:420px"></div>';
-  crumbs([{label:'Home', href:'#/'}, {label:d.name, href:`#/b/${enc(b)}`}, {label:subj.name, href:back}]);
+  crumbs([{label:'Home', href:'#/'}, {label:d.name, href:`#/b/${enc(b)}`}, {label:subj.name, href:c ? subjHref : back}]);
 
-  let list;
-  try { list = await getVideos(b, s); } catch { if (tok === R) $('main').innerHTML = topbar(back, false, 'Back to lectures') + '<div class="empty">Could not load lectures. Please refresh.</div>'; return; }
+  let list, chName = null;
+  try { const r = await getVideos(b, s, c); list = r.videos; chName = r.chapter; } catch { if (tok === R) $('main').innerHTML = topbar(back, false, 'Back to lectures') + '<div class="empty">Could not load lectures. Please refresh.</div>'; return; }
   if (tok !== R) return;
   if (!list.length) { $('main').innerHTML = topbar(back, false, 'Back to lectures') + '<div class="empty">No lectures here yet.</div>'; return; }
 
-  W = { b, s, list, cur:null, subj:subj.name, base:back };
+  if (c && chName) crumbs([{label:'Home', href:'#/'}, {label:d.name, href:`#/b/${enc(b)}`}, {label:subj.name, href:subjHref}, {label:chName, href:back}]);
+  W = { b, s, c, list, cur:null, subj:subj.name, chName, base:back };
   // No "Join Telegram" button on the player page, only Back.
   $('main').innerHTML = topbar(back, false, 'Back to lectures') + `
     <div class="watch">
@@ -456,7 +597,7 @@ async function watchPage(b, s, vid, tok) {
         </div>
       </div>
       <aside class="playlist" style="${cv(s + subj.name)}">
-        <div class="ph"><div>${esc(subj.name)}</div><span>${list.length} lectures</span></div>
+        <div class="ph"><div>${esc(chName || subj.name)}</div><span>${list.length} lectures</span></div>
         <div id="plist"></div>
       </aside>
     </div>`;
@@ -499,7 +640,7 @@ function play(v, autoplay = true) {
   W.cur = v;
   el.src = `/stream/${enc(W.b)}/${enc(W.s)}/${v.id}`;
   $('vtitle').textContent = v.title;
-  $('chip').textContent = W.subj + (v.lecture != null ? ` · Lecture ${v.lecture}` : '');
+  $('chip').textContent = W.subj + (W.chName ? ` · ${W.chName}` : '') + (v.lecture != null ? ` · Lecture ${v.lecture}` : '');
   document.title = `${v.title} – JEEINGO`;
   const p = store.get(pkey(W.b, W.s, v.id));
   el.onloadedmetadata = () => { if (p && p.t > 5 && !p.done) el.currentTime = p.t; el.playbackRate = +$('speed').value; };

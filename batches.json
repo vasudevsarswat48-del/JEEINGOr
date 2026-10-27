@@ -2,53 +2,436 @@
   {
     "slug": "pratham",
     "name": "Pratham",
+    "password": "Pratham11th@2028",
     "description": "Full 2-year integrated course for Class 11 students covering the complete JEE syllabus from fundamentals to Advanced level.",
     "subjects": [
-      {"slug": "physics", "name": "Physics", "channel": "-1004416967258"},
-      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004394385972"},
-      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004480061221"},
-      {"slug": "maths", "name": "Maths", "channel": "-1004462336439"}
+      {"slug": "physics", "name": "Physics", "channel": "-1004416967258",
+        "chapters": [
+    "Rectilinear motion",
+    "Projectile motion",
+    "Relative motion",
+    "NLM",
+    "Friction",
+    "WPE",
+    "Circular motion",
+    "Center of maas",
+    "RBD",
+    "SHM",
+    "Fluid Mechanics",
+    "Viscosity",
+    "Elasticity",
+    "Calorimetry",
+    "Thermal Expansion",
+    "KTG",
+    "Thermodynamics",
+    "Wave on string",
+    "Sound Wave",
+    "Surface Tension"
+  ]
+    },
+      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004394385972",
+       "chapters": [
+    "Introduction to chemistry",
+    
+    "Atomic structure",
+    
+    "Mole Concept",
+    "Periodic table",
+    "BIN",
+    "Gaseous state",
+    "Chemical bonding",
+    "Chemical equilibrium",
+    "B and C Family",
+    "Thermodynamics",
+    
+    "Thermochemistry",
+    
+    "Ionic equilirbrium",
+    "Equivalent concept",
+    "S-block",
+    
+    "Hydrogen"
+  ]
+    
+    },
+      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004480061221",
+       "chapters": [
+    "IUPAC nomenclature",
+    "Structural isomerism",
+    "Structural identification AND POC",
+    "GOC 1",
+    "GOC 2",
+    "Hydrocarbon",
+    "Environmental chemistry"
+  ]
+    },
+      {"slug": "maths", "name": "Maths", "channel": "-1004462336439",
+       "chapters": [
+    "Sets",
+    "FOM",
+    "Quadratic",
+    "Trigonometry",
+    "Progression",
+    "Binomial theorem",
+    "Permutation and Combination",
+    "Straight Line",
+    "Circle",
+    "Solution of triangle",
+    "Parabola",
+    "ELLIPSE",
+    "HYPERBOLA",
+    "Statistics"
+  ]
+    }
     ]
   },
   {
     "slug": "prakhar",
     "name": "Prakhar",
+    "password": "Prakhar12th@2027",
     "description": "1-year comprehensive batch for Class 12 students covering Class 12 syllabus.",
     "subjects": [
-      {"slug": "physics", "name": "Physics", "channel": "-1004409112025"},
-      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1003978695355"},
-      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004326230759"},
-      {"slug": "maths", "name": "Maths", "channel": "-1003870779366"}
+      {"slug": "physics", "name": "Physics", "channel": "-1004409112025",
+       "chapters": [
+      "Geometrical Optics",
+      "Electrostatics",
+      "Gravitation",
+      "Current electricity",
+      "Heat transfer",
+      "Capacitance",
+      "EMF",
+      "EMI",
+      "AC",
+      "EMW",
+      "Wave Optics",
+      "Modern Physics",
+      "Nuclear Physics",
+      "Semiconductor",
+      "Communication System",
+      "Error AND Measurement"
+    ]
+    },
+      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1003978695355",
+      "chapters": [
+    "Liquid solution",
+    "Coordination Compounds",
+    "Electrochemistry",
+    "Chemical kinetics",
+    "Qualitative Analysis Anion",
+    "GIC",
+    "Nitrogen And Oxygen Family",
+    "Qualatitive Analysis Canion",
+    "p BLOCK Group 17 and 18",
+    "d AND f block",
+    "Solid State",
+    "Metallurgy",
+    "Surface Chemistry"
+  ]
+    },
+      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004326230759",
+       "chapters": [
+      "Stereoisomerism",
+      "ORM 1",
+      "ORM 2",
+      "REDUCTION OXIDATION AND HYDROLYSIS",
+      "ORM 3",
+      "ORM 4",
+      "Aromatic",
+      "ALDEHYDE KETONES AND CARBOXYLIC ACID",
+      "Biomolecules",
+      "Polymers",
+      "CHEMISTRY IN EVERYDAY LIFE"
+    ]
+    },
+      {"slug": "maths", "name": "Maths", "channel": "-1003870779366",
+       "chapters": [
+      "FUNCTION",
+      "ITF",
+      "LIMITS",
+      "CONTINUITY",
+      "DIFFERENTIABILITY",
+      "MOD",
+      "AOD",
+      "Matrix",
+      "Determinants",
+      "INDEFINITE INTEGRATION",
+      "DEFINITE INTEGRATION",
+      "AREA",
+      "DIFFERENTIAL EQUATION",
+      "Probability",
+      "Vectors",
+      "Complex Number"
+    ]
+    }
     ]
   },
 
   {
     "slug": "praveen",
     "name": "Praveen",
+    "password": "Praveen13th@2027",
     "description": "Full-year target program specifically for droppers / Class 12 pass-outs.",
     "subjects": [
-      {"slug": "physics", "name": "Physics", "channel": "-1004493217591"},
-      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004485228413"},
-      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004293277834"},
-      {"slug": "maths", "name": "Maths", "channel": "-1004495116170"}
+      {"slug": "physics", "name": "Physics", "channel": "-1004493217591",
+       "chapters": [
+      "Mathematical Tools",
+      "Rectilinear Motion",
+      "Projectile motion",
+      "Relative motion",
+      "Geometrical optics",
+      "NLM",
+      "Friction",
+      "WPE",
+      "Circular motion",
+      "Center of mass",
+      "RBD",
+      "SHM",
+      "Electrostatics",
+      "Gravitation",
+      "Current Electricity",
+      "Capacitance",
+      "EMF",
+      "EMI",
+      "Alternating current",
+      "EMW",
+      "Modern Physics",
+      "Nuclear Physics",
+      "KTG",
+      "Thermodynamics",
+      " Calorimetry & Thermal Expansion",
+      "Fluid mechanics",
+      "Elasticity & Viscosity",
+      "Surface tension",
+      
+      "Wave on string",
+      "Sound Waves",
+      "Wave optics",
+      "Heat transfer",
+      "Semi Conductors",
+      "Comunication System",
+      "Errors & measurements"
+    ]
+    },
+      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004485228413",
+       "chapters": [
+      "Mole concept",
+      "QMM",
+      "Periodic table",
+      "Chemical bonding",
+      "Chemical equilibrium",
+      "Ionic equilibrium",
+      "Coordination Compounds",
+      "Electrochemistry",
+       "GIC",
+      "Qualatitive Analysis (Cation)",
+      "Chemical kinetics",
+      "Liquid solution",
+      "Surface Chemistry & p-Block",
+      "d & f block",
+      "ThermodynamicsThermochemistry",
+      "B & C Family",
+      "Equivalent concept",
+      "P-block (Group 17 & 18)",
+      
+      "Metallurgy",
+
+      "Solid State",
+      
+      "S-block",
+      "Real gas"
+    ]
+    },
+      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004293277834",
+       "chapters": [
+      "IUPAC",
+      "STRUCTURAL IDENTIFICATION",
+      "GOC 1",
+      "GOC 2",
+      "Stereoisomerism",
+      "ORM-1",
+      "ORM-2",
+      "REDUCTION OXIDATION",
+      "ORM-3",
+      "ORM-4",
+      "Aromatic Compounds",
+      "CARBONYL",
+      "Biomolecules",
+      "Polymer",
+      "Chemistry in everyday life"
+    ]
+    },
+      {"slug": "maths", "name": "Maths", "channel": "-1004495116170",
+       "chapters": [
+      "Sets",
+      "FOM",
+      "Trigonometry",
+      "Quadratic equation",
+      "Function",
+      "ITF",
+      "Statistics",
+      "Progression",
+      "Matrix",
+      "Determinants",
+      "Straight Line",
+      "Circle",
+      "Limit",
+      "Continuity",
+      "DIFFERENTIABILITY",
+      "Method Of Differentiation",
+      "AOD",
+      "Conic Section",
+      "Indefinite integration",
+      "Definite integration",
+      "Area",
+      "Differential equation",
+      "Vectors",
+      "Complex Number",
+      "Solution of triangle",
+      "Binomial",
+      "Permutation and Combination",
+      "Probability"
+    ]
+    }
     ]
   },
 
   {
     "slug": "fastlane",
     "name": "Praveen-Fastlane",
+    "password": "Praveen13vi@2027",
     "description": "Accelerated, high-intensity variant of Praveen designed to finish the syllabus early (by December).",
     "subjects": [
-      {"slug": "physics", "name": "Physics", "channel": "-1004387664018"},
-      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004330524716"},
-      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1003908875054"},
-      {"slug": "maths", "name": "Maths", "channel": "-1004451556448"}
+      {"slug": "physics", "name": "Physics", "channel": "-1004387664018",
+       "chapters": [
+      "Kinematics",
+      "Geometrical optics",
+      "Laws Of Motion",
+      "Friction",
+      "Work power energy",
+      "Circular motion",
+      "Centre of mass",
+      "Rigid Body Dynamics",
+      "Simple Harmonic Motion",
+      "Electrostatic",
+      "Gravitation",
+      "Current Electricity",
+      "Capacitance",
+      "EMF",
+      "EMI",
+      "Alternating current",
+      "EMW",
+      "Modern Physics",
+      "Nuclear Physics",
+      
+      "Thermodynamics",
+      "Thermal Expansion",
+      "Fluid mechanics",
+      "Elasticity",
+      
+      "Surface tension",
+      "Calorimetry",
+      "Wave on a string",
+      "Sound Wave",
+      "Wave optics",
+      "Heat transfer",
+      "Semiconductor",
+      "Communication System",
+      "Error & measurement"
     ]
+    },
+      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004330524716",
+       "chapters": [
+      "Mole concept",
+      "Quantum Mechanical Model",
+      "Periodic ",
+      "Chemical bonding",
+      "Chemical equilibrium",
+      "Ionic equlibrium",
+      "Coordination Compounds",
+      "Electrochemistry",
+      "General Inorganic Chemistry",
+      "P-block 13 & 14",
+      "P Block 15 & 16",
+      "P-block 17 & 18",
+      "Qualitative analysis",
+      "Chemical kinetics",
+      "Liquid solutions",
+      "d & f block",
+      "Thermodynamics",
+      "Thermochemistry",
+      "Equivalent concept",
+      
+     
+      "Metallurgy",
+      "Solid State",
+      
+      
+      "Surface Chemistry",
+      "S-block",
+      "Real gas"
+    ]
+    },
+      {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1003908875054",
+       "chapters": [
+      "IUPAC",
+      "STRUCTURAL IDENTIFICATION",
+      "GOC-1",
+      "GOC-2",
+      "Stereoisomerism",
+      "ORM-1",
+      "ORM-2",
+      "REDUCTION, OXIDATION & HYDROLYSIS",
+      "ORM-3",
+      "ORM-4",
+      "Aromatic Compounds",
+      "ALDEHYDE KETONE & CARBOXYLIC ACID",
+      "Biomolecules",
+      "Polymers",
+      "Environmental Chemistry",
+      "Chemistry in everyday life"
+    ]
+    },
+      {"slug": "maths", "name": "Maths", "channel": "-1004451556448",
+       "chapters": [
+      "Sets",
+      "FOM",
+      
+      "Quadratic equation",
+      "Relation",
+      "Functions",
+      "Inverse Trigonometric Function",
+      "Statistics",
+      "Progression",
+      "Matrices",
+      "Determinants",
+      "Straight Line",
+      "Circle",
+      "Limits",
+      "Continuity & Differentiability",
+      "Method Of Differentiation",
+      "Application of Derivatives",
+      "Parabola",
+      "Ellipse",
+      "Hyperbola",
+      "Indefinite integration",
+      "Definite integration",
+      "Area",
+      "Differential equation",
+      "Vector & 3D",
+      "Complex Number",
+      "Solution of triangle",
+      "Binomial theorem",
+      "Permutation and Combination",
+      "Probability"
+    ]
+    }
+    ] 
   },
 
   {
     "slug": "champ",
     "name": "CHAMP",
+    "password": "CHAMPion@2027",
     "description": "Specialized rank-enhancement program focused on short-notes revision, problem-solving techniques, and concept clearing ahead of JEE Main.",
     "subjects": [
       {"slug": "physics", "name": "Physics", "channel": "-1003979718188"},
@@ -60,6 +443,7 @@
   {
     "slug": "ccube",
     "name": "C³-Competishun Crash Course",
+    "password": "Crash@2027",
     "description": "Fast-paced revision crash course focusing on high-yield concepts and question-solving for upcoming JEE Main sessions.",
     "subjects": [
       {"slug": "physics", "name": "Physics", "channel": "-1004487052681", "name_line": 2},
@@ -71,6 +455,7 @@
   {
     "slug": "pragyaanm",
     "name": "Pragyaan-Mains",
+    "password": "pragyaanm@2027",
     "description": "Dedicated 1-year batch tailored strictly for JEE Main aspirants, featuring structured daily schedules and mapped problem sheets.",
     "subjects": [
       {"slug": "physics", "name": "Physics", "channel": "-1003989544657", "name_line": 2},
@@ -81,6 +466,7 @@
   {
     "slug": "abc",
     "name": "ABC Batch",
+    "password": "ABComp.@2027",
     "description": "Advanced problem-solving and score-booster programs focused on sharpening speed, accuracy, and test-taking strategy.",
     "subjects": [
       {"slug": "physics", "name": "Physics", "channel": "-1003773795128", "name_line": 2},
@@ -92,6 +478,7 @@
   {
     "slug": "cats",
     "name": "CATS",
+    "password": "CompATS@2027",
     "description": "Post-JEE Main batch tailored exclusively for JEE Advanced preparation through high-level problem solving, mock tests, and Advanced PYQs.",
     "subjects": [
       {"slug": "physics", "name": "Physics", "channel": "-1004338965736"},
@@ -102,11 +489,162 @@
   {
     "slug": "cats+",
     "name": "CATS-Plus",
+    "password": "CompATS+@2027",
     "description": "CATS Plus is an upgraded version of the regular CATS batch designed specifically for JEE Advanced.",
     "subjects": [
       {"slug": "physics", "name": "Physics", "channel": "-1004304979287"},
       {"slug": "chemistry", "name": "Chemistry", "channel": "-1004324770050"},
       {"slug": "maths", "name": "Maths", "channel": "-1004335667621"}
+    ]
+  },
+
+  {
+    "slug": "nvsir",
+    "name": "NV Sir-Physics",
+    "password": "NitinVijay@alltime",
+    "description": "All Physics Lectures Of Nitin Vijay[NV] Sir-Motion",
+    "subjects": [
+      
+      {"slug": "physics", "name": "Physics", "channel": "-1004430962618"}
+    ]
+  },
+
+  {
+    "slug": "acc",
+    "name": "Allen Crash Course",
+    "password": "ACC@offline",
+    "description": "Allen crash course foe JEE-Mains",
+    "subjects": [
+      
+      {"slug": "physics", "name": "Physics", "channel": "-1004486572227",
+       "chapters": [
+      
+      "Vector (Physics)",
+      "Kinematics",
+      "Projectile Motion",
+      
+      "Ray optics",
+      "NLM",
+      
+      "Work, power & energy",
+      "Circular Motion",
+      
+      "Rotational Dynamics",
+      "SHM",
+      "Electrostatics",
+      "Gravitation",
+      "Current Electricity",
+      "Capacitor",
+      "Magnetic Effect of Current",
+      "Magnetism",
+      "EMI",
+      "Alternating current",
+      
+      "Photo Electric Effect",
+      "Nuclear Physics",
+      "Radioactivity",
+      "Kinetic theory of Gases",
+      "Thermo",
+      "Heat",
+      "Calorimetry",
+      "Fluid Dynamics",
+      "Elasticity",
+      "Surface Tension",
+      
+      "Wave Motion",
+      "Matter Waves",
+      "Sound Wave",
+      "Wave optics",
+      
+      "Semiconductor",
+      "Communication"
+      
+    ]
+    },
+      {"slug": "chemistryp", "name": "Chemistry-P&I", "channel": "-1004210909629",
+       "chapters": [
+      "Mole concept",
+      "Redox",
+      "Atomic structure",
+      "Periodic table",
+      "Chemical bonding",
+      "Chemical Equilibrium",
+      "Acid Base",
+      "Ionic Equilibrium",
+      "Coordination Compounds",
+      "Electrochemistry",
+      
+      
+      "Chemical Kinetics",
+      "Solution",
+      "Surface Chemistry",
+      "D & F Block",
+      "Thermodynamics",
+      "Thermochemistry",
+      
+      
+      "P Block",
+      
+      "Metallurgy",
+      "Hydrogen & it's Compound",
+
+      "Solid State",
+      
+      "S block",
+      "Real gas"
+    ]
+    },
+    {"slug": "chemistryo", "name": "Chemistry-ORG", "channel": "-1004344332938",
+     "chapters": [
+      "Nomenclature",
+      "Isomerism",
+      "GOC",
+      "Hydrocarbon",
+      "Aromatic Hydrocarbon",
+      "Halogen Derivatives",
+      "Alcohol & Ether",
+      "Carbonyl Compounds",
+      "Nitrogen Compounds",
+      "Biomolecules",
+      "Polymers"
+     ]
+  },
+      {"slug": "maths", "name": "Maths", "channel": "-1004335667621",
+       "chapters": [
+      "Sets & Probability",
+      
+      "Trigonometry",
+      "Quadratic equation",
+      "Function",
+      "Inverse Trigonometric Fxn",
+      "Statistics",
+      "Progression",
+      "Matrices",
+      "Determinant",
+      "Straight Line",
+      "Height & Distance",
+      "Circle",
+      "Limits",
+      "Continuity",
+      "DIFFERENTIABILITY",
+      "Differentiation",
+      "Application of Derivatives",
+      "Parabola",
+      "Ellipse",
+      "Hyperbola",
+      "Indefinite integration",
+      "Definite integration",
+      "Area",
+      "Differential equations",
+      "Vector",
+      "3D Coordinate Geometry",
+      "Complex Number",
+      
+      "Binomial theorem",
+      "PnC"
+      
+    ]
+    }
     ]
   }
 ]

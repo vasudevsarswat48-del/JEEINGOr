@@ -15,17 +15,20 @@ from telethon.tl.types import InputMessagesFilterVideo, InputMessagesFilterDocum
 
 load_dotenv()
 
-API_ID = int(os.environ["API_ID"])
-API_HASH = os.environ["API_HASH"]
-BOT_TOKEN = os.environ["BOT_TOKEN"]  # Replaced SESSION_STRING with BOT_TOKEN
+API_ID = int(os.environ.get("API_ID", 0))
+API_HASH = os.environ.get("API_HASH", "")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 SITE_PASSWORD = os.environ.get("SITE_PASSWORD", "")  # empty = no login
-SECRET = os.environ.get("COOKIE_SECRET", BOT_TOKEN[:32])
+SECRET = os.environ.get("COOKIE_SECRET", (BOT_TOKEN or "fallback_secret")[:32])
 
 CHUNK = 1024 * 1024
 INDEX_TTL = 600  # seconds; new uploads appear within ~10 minutes (or use ?refresh=1)
 
-with open("batches.json", encoding="utf-8") as f:
-    RAW = json.load(f)
+try:
+    with open("batches.json", encoding="utf-8") as f:
+        RAW = json.load(f)
+except Exception:
+    RAW = []
 
 BATCHES: dict[str, dict] = {}
 for b in RAW:
@@ -39,7 +42,6 @@ client = TelegramClient('bot_session', API_ID, API_HASH)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Safe serverless lifespan startup
     yield
     try:
         if client.is_connected():
@@ -97,7 +99,6 @@ async def login(password: str = Form(...)):
     if not hmac.compare_digest(password, SITE_PASSWORD):
         return RedirectResponse("/login?bad=1", status_code=303)
     r = RedirectResponse("/", status_code=303)
-    # session cookie (no max_age): browser forgets it when closed
     r.set_cookie("auth", token(), httponly=True, samesite="lax")
     return r
 
@@ -106,7 +107,7 @@ async def login(password: str = Form(...)):
 async def logout(request: Request):
     r = RedirectResponse("/login" if SITE_PASSWORD else "/", status_code=303)
     r.delete_cookie("auth")
-    for k in request.cookies:            # also forget every unlocked batch
+    for k in request.cookies:
         if k.startswith("bk_"):
             r.delete_cookie(k)
     return r
@@ -120,7 +121,6 @@ STRIP = " -–—:|,._#[]()"
 
 
 def parse_caption(text: str | None, fname: str | None, line_n: int, custom):
-    """Returns (title, chapter, lecture_no)."""
     lines = [l.strip() for l in (text or "").splitlines() if l.strip()]
     if lines:
         line = lines[line_n - 1] if 0 < line_n <= len(lines) else lines[0]
@@ -188,24 +188,21 @@ def video_info(m, line_n, custom):
         "mime": doc.mime_type,
         "date": m.date.isoformat(),
         "raw": (m.message or "")[:300],
-        "hay": norm((m.message or "") + " " + (fname or "")),   # whole caption + file name, used for chapter matching
+        "hay": norm((m.message or "") + " " + (fname or "")),
     }
 
 
-# ---------- helpers ----------
 def get_batch(slug: str) -> dict:
     if slug not in BATCHES:
         raise HTTPException(404, "Unknown batch")
     return BATCHES[slug]
 
 
-# ---------- per-batch password ----------
 def batch_key(slug: str) -> str:
     return "bk_" + hashlib.md5(slug.encode()).hexdigest()[:12]
 
 
 def batch_token(b: dict) -> str:
-    # changes automatically when the batch password is changed, so old unlocks stop working
     return hmac.new(SECRET.encode(), f"batch:{b['slug']}:{b['password']}".encode(), hashlib.sha256).hexdigest()
 
 
@@ -232,9 +229,6 @@ def get_subject(batch: dict, slug: str) -> dict:
 
 
 def chapter_specs(s: dict) -> list[dict]:
-    """Reads the optional "chapters" list of a subject in batches.json.
-    Each item is either a plain name ("Kinematics") or
-    {"name": "Kinematics", "match": ["kinematic", "motion in a straight line"]}."""
     out = []
     for i, c in enumerate(s.get("chapters") or [], 1):
         if isinstance(c, str):
@@ -252,7 +246,6 @@ def chapter_specs(s: dict) -> list[dict]:
 
 
 def assign_chapter(v: dict, specs: list[dict]):
-    """Chapter whose name is found in the caption. If several are found, the longest (most specific) wins."""
     hay = f" {v['hay']} "
     best, best_len = None, 0
     for sp in specs:
@@ -288,7 +281,6 @@ async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
         if s.get("topic_id"):
             kwargs["reply_to"] = int(s["topic_id"])
 
-        # videos sent as "video" AND videos sent as "file/document" (e.g. abc.mp4)
         vids, seen = [], set()
         await ensure_connected()
         for flt in (InputMessagesFilterVideo, InputMessagesFilterDocument):
@@ -380,7 +372,7 @@ async def unlock(bslug: str, request: Request):
         raise HTTPException(403, "Wrong password")
     attempts.pop(key, None)
     r = JSONResponse({"ok": True})
-    r.set_cookie(batch_key(bslug), batch_token(b), httponly=True, samesite="lax")   # session cookie
+    r.set_cookie(batch_key(bslug), batch_token(b), httponly=True, samesite="lax")
     return r
 
 
@@ -442,7 +434,6 @@ async def videos(request: Request, bslug: str, sslug: str, chapter: str | None =
 
 @app.get("/api/batches/{bslug}/subjects/{sslug}/debug")
 async def debug(request: Request, bslug: str, sslug: str, n: int = 60):
-    """Open in browser to check how captions are being read."""
     require_batch(request, bslug)
     idx = await get_index(bslug, sslug, True)
     return [
@@ -469,7 +460,7 @@ async def stream(bslug: str, sslug: str, msg_id: int, request: Request):
     doc = m.document
     size = doc.size
     mime = doc.mime_type or "video/mp4"
-    if not mime.startswith("video/"):          # files sent as documents often say application/octet-stream
+    if not mime.startswith("video/"):
         mime = "video/webm" if doc_name(doc).lower().endswith(".webm") else "video/mp4"
 
     start, end, status = 0, size - 1, 200

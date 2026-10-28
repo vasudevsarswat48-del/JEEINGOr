@@ -12,6 +12,7 @@ from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response, StreamingResponse
 from telethon import TelegramClient
 from telethon.tl.types import InputMessagesFilterVideo, InputMessagesFilterDocument
+from telethon.sessions import MemorySession
 
 load_dotenv()
 
@@ -38,7 +39,7 @@ for b in RAW:
     b["password"] = "" if b.get("password") in (None, "") else str(b["password"])   # optional per-batch password
     BATCHES[b["slug"]] = b
 
-client = TelegramClient('bot_session', API_ID, API_HASH)
+client = TelegramClient(MemorySession(), API_ID, API_HASH)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

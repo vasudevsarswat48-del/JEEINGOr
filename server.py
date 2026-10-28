@@ -40,7 +40,7 @@ client = TelegramClient(StringSession(SESSION_STRING), API_ID, API_HASH)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Lazy connection used instead of blocking startup loops for serverless safety
+    # Safe serverless lifespan: no blocking client.start() loop
     yield
     try:
         if client.is_connected():
@@ -48,6 +48,7 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
 
+# Defined prominently at the top level so Vercel detects it instantly
 app = FastAPI(lifespan=lifespan)
 
 entities: dict[str, object] = {}

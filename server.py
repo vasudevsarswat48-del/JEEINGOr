@@ -288,18 +288,14 @@ async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
         vids, seen = [], set()
         await ensure_connected()
         
-        try:
-            for flt in (InputMessagesFilterVideo, InputMessagesFilterDocument):
-                async for m in client.iter_messages(ent, filter=flt, **kwargs):
-                    if not m.document or m.id in seen or not is_video_doc(m.document):
-                        continue
-                    seen.add(m.id)
-                    vids.append(video_info(m, line_n, custom))
-            print(f"SUCCESS: Fetched {len(vids)} videos for {bslug}/{sslug}")
-        except Exception as e:
-            print(f"ERROR iterating messages for {bslug}/{sslug}: {e}")
-            raise HTTPException(500, f"Telegram fetch error: {e}")
-
+        # Safe message fetching loop for bot tokens (iterates channel messages directly without search requests)
+        async for m in client.iter_messages(ent, limit=3000):
+            if not m.document or m.id in seen:
+                continue
+            if is_video_doc(m.document):
+                seen.add(m.id)
+                vids.append(video_info(m, line_n, custom))
+                
         vids.sort(key=lambda v: v["id"])
         # (rest of your chapter grouping logic...)
         specs = chapter_specs(s)

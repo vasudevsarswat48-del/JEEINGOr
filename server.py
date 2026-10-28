@@ -268,13 +268,16 @@ async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
             return c
         b = get_batch(bslug)
         s = get_subject(b, sslug)
-        ent = await resolve_channel(chan_of(b, s))
+        
+        try:
+            ent = await resolve_channel(chan_of(b, s))
+        except Exception as e:
+            print(f"ERROR resolving channel {chan_of(b, s)}: {e}")
+            raise HTTPException(500, f"Channel resolution error: {e}")
+
         line_n = int(s.get("name_line") or b.get("name_line") or 1)
         pattern = s.get("chapter_regex") or b.get("chapter_regex")
-        try:
-            custom = re.compile(pattern, re.I) if pattern else None
-        except re.error:
-            custom = None
+        custom = re.compile(pattern, re.I) if pattern else None
 
         kwargs = dict(limit=None)
         if s.get("search"):
@@ -284,14 +287,21 @@ async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
 
         vids, seen = [], set()
         await ensure_connected()
-        for flt in (InputMessagesFilterVideo, InputMessagesFilterDocument):
-            async for m in client.iter_messages(ent, filter=flt, **kwargs):
-                if not m.document or m.id in seen or not is_video_doc(m.document):
-                    continue
-                seen.add(m.id)
-                vids.append(video_info(m, line_n, custom))
-        vids.sort(key=lambda v: v["id"])
+        
+        try:
+            for flt in (InputMessagesFilterVideo, InputMessagesFilterDocument):
+                async for m in client.iter_messages(ent, filter=flt, **kwargs):
+                    if not m.document or m.id in seen or not is_video_doc(m.document):
+                        continue
+                    seen.add(m.id)
+                    vids.append(video_info(m, line_n, custom))
+            print(f"SUCCESS: Fetched {len(vids)} videos for {bslug}/{sslug}")
+        except Exception as e:
+            print(f"ERROR iterating messages for {bslug}/{sslug}: {e}")
+            raise HTTPException(500, f"Telegram fetch error: {e}")
 
+        vids.sort(key=lambda v: v["id"])
+        # (rest of your chapter grouping logic...)
         specs = chapter_specs(s)
         order = lambda v: (v["lecture"] is None, v["lecture"] or 0, v["id"])
         chapters = []

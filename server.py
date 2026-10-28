@@ -275,7 +275,13 @@ async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
             return c
         b = get_batch(bslug)
         s = get_subject(b, sslug)
-        ent = await resolve_channel(chan_of(b, s))
+        
+        try:
+            ent = await resolve_channel(chan_of(b, s))
+        except Exception as e:
+            print(f"CRITICAL: Failed to resolve channel for {bslug}/{sslug}: {e}")
+            raise HTTPException(500, f"Channel resolution error: {e}")
+
         line_n = int(s.get("name_line") or b.get("name_line") or 1)
         pattern = s.get("chapter_regex") or b.get("chapter_regex")
         try:
@@ -289,15 +295,20 @@ async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
         if s.get("topic_id"):
             kwargs["reply_to"] = int(s["topic_id"])
 
-        # videos sent as "video" AND videos sent as "file/document" (e.g. abc.mp4)
         vids, seen = [], set()
         await ensure_connected()
-        for flt in (InputMessagesFilterVideo, InputMessagesFilterDocument):
-            async for m in client.iter_messages(ent, filter=flt, **kwargs):
-                if not m.document or m.id in seen or not is_video_doc(m.document):
-                    continue
-                seen.add(m.id)
-                vids.append(video_info(m, line_n, custom))
+        
+        try:
+            for flt in (InputMessagesFilterVideo, InputMessagesFilterDocument):
+                async for m in client.iter_messages(ent, filter=flt, **kwargs):
+                    if not m.document or m.id in seen or not is_video_doc(m.document):
+                        continue
+                    seen.add(m.id)
+                    vids.append(video_info(m, line_n, custom))
+        except Exception as e:
+            print(f"CRITICAL: Failed to iterate messages for {bslug}/{sslug}: {e}")
+            raise HTTPException(500, f"Telegram fetch error: {e}")
+
         vids.sort(key=lambda v: v["id"])
 
         specs = chapter_specs(s)

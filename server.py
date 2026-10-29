@@ -91,7 +91,6 @@ async def login(password: str = Form(...)):
     if not hmac.compare_digest(password, SITE_PASSWORD):
         return RedirectResponse("/login?bad=1", status_code=303)
     r = RedirectResponse("/", status_code=303)
-    # session cookie (no max_age): browser forgets it when closed
     r.set_cookie("auth", token(), httponly=True, samesite="lax")
     return r
 
@@ -100,7 +99,7 @@ async def login(password: str = Form(...)):
 async def logout(request: Request):
     r = RedirectResponse("/login" if SITE_PASSWORD else "/", status_code=303)
     r.delete_cookie("auth")
-    for k in request.cookies:            # also forget every unlocked batch
+    for k in request.cookies:
         if k.startswith("bk_"):
             r.delete_cookie(k)
     return r
@@ -114,7 +113,6 @@ STRIP = " -–—:|,._#[]()"
 
 
 def parse_caption(text: str | None, fname: str | None, line_n: int, custom):
-    """Returns (title, chapter, lecture_no)."""
     lines = [l.strip() for l in (text or "").splitlines() if l.strip()]
     if lines:
         line = lines[line_n - 1] if 0 < line_n <= len(lines) else lines[0]
@@ -182,24 +180,21 @@ def video_info(m, line_n, custom):
         "mime": doc.mime_type,
         "date": m.date.isoformat(),
         "raw": (m.message or "")[:300],
-        "hay": norm((m.message or "") + " " + (fname or "")),   # whole caption + file name, used for chapter matching
+        "hay": norm((m.message or "") + " " + (fname or "")),
     }
 
 
-# ---------- helpers ----------
 def get_batch(slug: str) -> dict:
     if slug not in BATCHES:
         raise HTTPException(404, "Unknown batch")
     return BATCHES[slug]
 
 
-# ---------- per-batch password ----------
 def batch_key(slug: str) -> str:
     return "bk_" + hashlib.md5(slug.encode()).hexdigest()[:12]
 
 
 def batch_token(b: dict) -> str:
-    # changes automatically when the batch password is changed, so old unlocks stop working
     return hmac.new(SECRET.encode(), f"batch:{b['slug']}:{b['password']}".encode(), hashlib.sha256).hexdigest()
 
 
@@ -226,9 +221,6 @@ def get_subject(batch: dict, slug: str) -> dict:
 
 
 def chapter_specs(s: dict) -> list[dict]:
-    """Reads the optional "chapters" list of a subject in batches.json.
-    Each item is either a plain name ("Kinematics") or
-    {"name": "Kinematics", "match": ["kinematic", "motion in a straight line"]}."""
     out = []
     for i, c in enumerate(s.get("chapters") or [], 1):
         if isinstance(c, str):
@@ -246,7 +238,6 @@ def chapter_specs(s: dict) -> list[dict]:
 
 
 def assign_chapter(v: dict, specs: list[dict]):
-    """Chapter whose name is found in the caption. If several are found, the longest (most specific) wins."""
     hay = f" {v['hay']} "
     best, best_len = None, 0
     for sp in specs:
@@ -282,7 +273,6 @@ async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
         if s.get("topic_id"):
             kwargs["reply_to"] = int(s["topic_id"])
 
-        # videos sent as "video" AND videos sent as "file/document" (e.g. abc.mp4)
         vids, seen = [], set()
         for flt in (InputMessagesFilterVideo, InputMessagesFilterDocument):
             async for m in client.iter_messages(ent, filter=flt, **kwargs):
@@ -333,6 +323,16 @@ async def get_msg(bslug: str, sslug: str, msg_id: int):
     return m
 
 
+# ---------- STUDY MATERIALS LOCAL FOLDER HELPER ----------
+def get_subject_material_dir(b: dict, s: dict) -> str:
+    # Check if 'source' is specified in batches.json for this subject
+    src = s.get("source")
+    if src:
+        return os.path.abspath(src)
+    # Default fallback folder structure if 'source' is not explicitly specified
+    return os.path.abspath(os.path.join("study_materials", b["slug"], s["slug"]))
+
+
 # ---------- API ----------
 @app.get("/api/batches")
 async def batches(request: Request):
@@ -372,7 +372,7 @@ async def unlock(bslug: str, request: Request):
         raise HTTPException(403, "Wrong password")
     attempts.pop(key, None)
     r = JSONResponse({"ok": True})
-    r.set_cookie(batch_key(bslug), batch_token(b), httponly=True, samesite="lax")   # session cookie
+    r.set_cookie(batch_key(bslug), batch_token(b), httponly=True, samesite="lax")
     return r
 
 
@@ -389,6 +389,46 @@ async def batch_detail(request: Request, bslug: str):
             for s in b["subjects"]
         ],
     }
+
+
+# ---------- STUDY MATERIALS API ROUTES ----------
+@app.get("/api/batches/{bslug}/subjects/{sslug}/materials")
+async def list_study_materials(request: Request, bslug: str, sslug: str, subpath: str = ""):
+    b = require_batch(request, bslug)
+    s = get_subject(b, sslug)
+    
+    base_path = get_subject_material_dir(b, s)
+    target_path = os.path.abspath(os.path.join(base_path, subpath))
+    
+    if not target_path.startswith(base_path) or not os.path.exists(target_path):
+        raise HTTPException(404, "Folder not found")
+
+    items = []
+    for entry in sorted(os.listdir(target_path)):
+        if entry.startswith('.'):
+            continue
+        full_p = os.path.join(target_path, entry)
+        rel_p = os.path.relpath(full_p, base_path).replace("\\", "/")
+        if os.path.isdir(full_p):
+            items.append({"name": entry, "is_dir": True, "path": rel_p})
+        elif entry.lower().endswith(".pdf"):
+            items.append({"name": entry, "is_dir": False, "path": rel_p, "size": os.path.getsize(full_p)})
+            
+    return {"current_path": subpath, "items": items}
+
+
+@app.get("/api/batches/{bslug}/subjects/{sslug}/pdf")
+async def get_pdf(request: Request, bslug: str, sslug: str, filepath: str):
+    b = require_batch(request, bslug)
+    s = get_subject(b, sslug)
+    
+    base_path = get_subject_material_dir(b, s)
+    target_path = os.path.abspath(os.path.join(base_path, filepath))
+    
+    if not target_path.startswith(base_path) or not os.path.exists(target_path) or not target_path.lower().endswith(".pdf"):
+        raise HTTPException(404, "PDF not found")
+        
+    return FileResponse(target_path, media_type="application/pdf")
 
 
 @app.get("/api/batches/{bslug}/subjects/{sslug}/chapters")
@@ -434,7 +474,6 @@ async def videos(request: Request, bslug: str, sslug: str, chapter: str | None =
 
 @app.get("/api/batches/{bslug}/subjects/{sslug}/debug")
 async def debug(request: Request, bslug: str, sslug: str, n: int = 60):
-    """Open in browser to check how captions are being read."""
     require_batch(request, bslug)
     idx = await get_index(bslug, sslug, True)
     return [
@@ -460,7 +499,7 @@ async def stream(bslug: str, sslug: str, msg_id: int, request: Request):
     doc = m.document
     size = doc.size
     mime = doc.mime_type or "video/mp4"
-    if not mime.startswith("video/"):          # files sent as documents often say application/octet-stream
+    if not mime.startswith("video/"):
         mime = "video/webm" if doc_name(doc).lower().endswith(".webm") else "video/mp4"
 
     start, end, status = 0, size - 1, 200

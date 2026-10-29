@@ -446,7 +446,7 @@
     "password": "Crash@2027",
     "description": "Fast-paced revision crash course focusing on high-yield concepts and question-solving for upcoming JEE Main sessions.",
     "subjects": [
-      {"slug": "physics", "name": "Physics", "channel": "-1004487052681", "name_line": 2},
+      {"slug": "physics", "name": "Physics", "channel": "-1004487052681","source": "Physics", "name_line": 2},
       {"slug": "chemistry", "name": "Chemistry", "channel": "-1004421740493", "name_line": 2},
       {"slug": "maths", "name": "Maths", "channel": "-1003980064478", "name_line": 2}
     ]

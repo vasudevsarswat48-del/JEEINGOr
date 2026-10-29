@@ -154,6 +154,17 @@
   .skel { height:200px; border-radius:24px; background:linear-gradient(100deg,var(--card) 30%,var(--card2) 50%,var(--card) 70%); background-size:200% 100%; animation:sh 1.3s infinite; border:1px solid var(--line); }
   @keyframes sh { to { background-position:-200% 0; } }
 
+  /* ---------- PDF Viewer Styles ---------- */
+  .pdf-viewer-container { display:grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; height: calc(100vh - 140px); }
+  .pdf-sidebar { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 16px; height: 100%; overflow-y: auto; }
+  .pdf-main-view { background: var(--card); border: 1px solid var(--line); border-radius: 20px; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
+  .pdf-iframe { width: 100%; height: 100%; border: none; background: #fff; }
+  .file-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; cursor: pointer; transition: background .15s; margin-bottom: 6px; font-weight: 500; font-size: 14px; }
+  .file-item:hover { background: var(--card2); }
+  .file-item.active { background: var(--pill); border: 1px solid var(--line); }
+  .file-item .svg { width: 18px; height: 18px; flex: none; color: var(--accent); }
+  @media (max-width: 900px) { .pdf-viewer-container { grid-template-columns: 1fr; height: auto; } .pdf-main-view { height: 70vh; } }
+
   /* ---------- lecture grid ---------- */
   .vgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(256px,1fr)); gap:20px; }
   .vcard { display:block; background:var(--card); border:1px solid var(--line); border-radius:20px; overflow:hidden; box-shadow:var(--shadow); transition:transform .25s cubic-bezier(.2,.8,.2,1), border-color .25s, box-shadow .25s; animation:rise .5s both; }
@@ -232,19 +243,9 @@
 <footer><b>JEEINGO</b> &nbsp;·&nbsp; Keep learning, keep growing.</footer>
 
 <script>
-/* ============ SETTINGS ============
-   Put your Telegram discussion group / channel link between the quotes.
-   Example: "https://t.me/jeeingo_discussion"
-   Leave it as "" to hide the Join Telegram button.                          */
 const TELEGRAM_LINK = "https://t.me/jeeingo";
-
-/* Link of your Test Series website (the Next.js app), e.g. "https://jeeingo-tests.netlify.app"
-   Leave it as "" to hide the Join Test Series button.                       */
 const TEST_SERIES_LINK = "https://jeeingotests.netlify.app/";
-/* =================================== */
 
-/* ---- ask for the password every time the site is reopened ----
-   (the server fills in __PROTECTED__ with 1 when SITE_PASSWORD is set) */
 let BLOCKED = false;
 if ("__PROTECTED__" === "1") {
   try { if (!sessionStorage.getItem('jg')) { BLOCKED = true; location.replace('/logout'); } } catch (e) {}
@@ -268,7 +269,6 @@ const api = async u => { const r = await fetch(u); if (r.status === 401) { locat
 const pkey = (b,s,id) => `p:${b}:${s}:${id}`;
 const skel = n => '<div class="skel"></div>'.repeat(n);
 
-/* ---------- icons (line icons, no emoji) ---------- */
 const ICONS = {
   test: '<rect x="6" y="4" width="12" height="17" rx="2.5"/><path d="M9 4h6v2.5a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/><path d="m9.5 13.5 2 2 3.5-4"/>',
   atom:'<circle cx="12" cy="12" r="1.8" fill="currentColor"/><ellipse cx="12" cy="12" rx="10" ry="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(120 12 12)"/>',
@@ -286,6 +286,8 @@ const ICONS = {
   play:'<path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor" stroke="none"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   lock:'<rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor"/>',
+  folder: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+  book: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h12M6 10h12"/>'
 };
 const svg = k => `<svg class="svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]}</svg>`;
 const BATCH_ICONS = ['cap','rocket','target','trophy'];
@@ -300,7 +302,7 @@ function iconFor(name, slug, given, i = 0) {
 
 const cache = { details:{}, videos:{}, chapters:{} };
 const getDetail = async b => cache.details[b] ||= await api(`/api/batches/${enc(b)}`);
-const fresh = h => h && Date.now() - h.t < 300000;   // refresh every 5 minutes
+const fresh = h => h && Date.now() - h.t < 300000;
 const getVideos = async (b, s, c) => {
   const k = `${b}/${s}/${c || ''}`, h = cache.videos[k];
   if (fresh(h)) return h.r;
@@ -328,27 +330,24 @@ $('theme').onclick = () => {
   document.querySelector('meta[name=theme-color]').content = n === 'light' ? '#f4f1ea' : '#07080c';
 };
 
-/* ---------- Back + Join Telegram ---------- */
 const TG_SVG = `<svg viewBox="0 0 24 24" fill="#1f2a44" stroke="#1f2a44" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13" stroke="#fff" stroke-width="1.6"/></svg>`;
 const tgBtn = () => TELEGRAM_LINK ? `<a class="tg" href="${esc(TELEGRAM_LINK)}" target="_blank" rel="noopener noreferrer">${TG_SVG}<span>Join Telegram</span></a>` : '';
 const tsBtn = () => TEST_SERIES_LINK ? `<a class="ts" href="${esc(TEST_SERIES_LINK)}" target="_blank" rel="noopener noreferrer">${svg('test')}<span>Join Test Series</span></a>` : '';
 const backBtn = (href, label = 'Back') => href ? `<a class="back" href="${href}">${svg('back')}${label}</a>` : '<span></span>';
 const topbar = (back, withTg = true, label) => `<div class="topbar">${backBtn(back, label)}${withTg ? `<div class="topright">${tgBtn()}${tsBtn()}</div>` : ''}</div>`;
 
-/* ---------- routing ----------
- #/                          batches
- #/b/B                       subjects
- #/b/B/s/S                   chapter boxes (if the subject has chapters) or all lectures
- #/b/B/s/S/c/C               lectures of one chapter
- #/b/B/s/S/v/ID              player (subject without chapters)
- #/b/B/s/S/c/C/v/ID          player (chapter)                   */
 let W = null, R = 0, batchList = null;
 function parseHash() {
   const p = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   const o = {};
-  for (let i = 0; i < p.length; i += 2) o[p[i]] = p[i+1];
+  for (let i = 0; i < p.length; i += 2) {
+    if (p[i] === 'materials') { o.type = 'materials'; o.s = p[i+1]; }
+    else if (p[i] === 'subpath') { o.subpath = p.slice(i+1).join('/'); break; }
+    else { o[p[i]] = p[i+1]; }
+  }
   return o;
 }
+
 function route() {
   const tok = ++R;
   const o = parseHash();
@@ -358,19 +357,20 @@ function route() {
   if (o.b) return checkLock(o.b, tok).then(ok => { if (ok) dispatch(o, tok, watching); });
   return home(tok);
 }
+
 function dispatch(o, tok, watching) {
   if (watching) return watchPage(o.b, o.s, +o.v, tok, o.c || null);
+  if (o.b && o.type === 'materials' && o.s) return studyMaterialsPage(o.b, o.s, o.subpath || '', tok);
   if (o.b && o.s && o.c) return lecturesPage(o.b, o.s, tok, o.c);
   if (o.b && o.s) return subjectPage(o.b, o.s, tok);
   return batchPage(o.b, tok);
 }
 
-/* ---------- batch password ---------- */
 async function checkLock(b, tok) {
   try { await getDetail(b); return tok === R; }
   catch (e) {
     if (e.status === 403) { if (tok === R) lockPage(b, tok); return false; }
-    return tok === R;          // other errors: the page itself shows "not found"
+    return tok === R;
   }
 }
 
@@ -405,7 +405,6 @@ async function lockPage(b, tok) {
 }
 if (!BLOCKED) { window.addEventListener('hashchange', route); route(); }
 
-/* ---------- home: batches ---------- */
 async function home(tok) {
   crumbs([]); document.title = 'JEEINGO';
   $('main').innerHTML = `<div class="hero">
@@ -431,24 +430,37 @@ async function home(tok) {
     </a>`).join('') : '<div class="empty">No batches yet.</div>';
 }
 
-/* ---------- batch: subjects ---------- */
 async function batchPage(b, tok) {
   let d;
   try { d = await getDetail(b); } catch { if (tok === R) $('main').innerHTML = topbar('#/') + '<div class="empty">Batch not found.</div>'; return; }
   if (tok !== R) return;
   document.title = `${d.name} – JEEINGO`;
   crumbs([{label:'Home', href:'#/'}, {label:d.name}]);
-  $('main').innerHTML = topbar('#/') + `<div class="sechead"><div><h2>${esc(d.name)}</h2><p>${esc(d.description)}</p></div></div><div class="rule"></div><div class="boxes">` +
-    d.subjects.map((s, i) => `
-    <a class="box" href="#/b/${enc(b)}/s/${enc(s.slug)}" style="${cv(s.slug + s.name)};animation-delay:${i*70}ms">
+  
+  let html = topbar('#/') + `<div class="sechead"><div><h2>${esc(d.name)}</h2><p>${esc(d.description)}</p></div></div><div class="rule"></div><div class="boxes">`;
+  
+  d.subjects.forEach((s, i) => {
+    // 1. Video lectures subject card
+    html += `<a class="box" href="#/b/${enc(b)}/s/${enc(s.slug)}" style="${cv(s.slug + s.name)};animation-delay:${i*70}ms">
       <div class="pat ${pat(s.slug + s.name)}"></div>
       <div><div class="row"><div class="tile">${iconFor(s.name, s.slug, s.icon, i)}</div><div class="idx">${String(i+1).padStart(2,'0')}</div></div>
-      <div class="nm">${esc(s.name)}</div><div class="ds">${esc(s.description) || (s.has_chapters ? 'Chapter-wise lectures.' : 'All lectures, in order.')}</div></div>
+      <div class="nm">${esc(s.name)} (Videos)</div><div class="ds">${esc(s.description) || (s.has_chapters ? 'Chapter-wise video lectures.' : 'All video lectures.')}</div></div>
       <div class="ft"><b>${s.has_chapters ? 'View chapters' : 'View lectures'}</b><span class="arrow">${svg('arrow')}</span></div>
-    </a>`).join('') + '</div>';
+    </a>`;
+    
+    // 2. Study Material option card for each subject
+    html += `<a class="box" href="#/b/${enc(b)}/materials/${enc(s.slug)}" style="${cv(s.slug + 'mat');animation-delay:${(i+1)*70}ms">
+      <div class="pat ${pat(s.slug + 'mat')}"></div>
+      <div><div class="row"><div class="tile">${svg('book')}</div><div class="idx">PDF</div></div>
+      <div class="nm">${esc(s.name)} (Study Material)</div><div class="ds">Access local PDF notes, DPPs and folders for ${esc(s.name)}.</div></div>
+      <div class="ft"><b>View PDFs</b><span class="arrow">${svg('arrow')}</span></div>
+    </a>`;
+  });
+
+  html += '</div>';
+  $('main').innerHTML = html;
 }
 
-/* ---------- subject: chapter boxes (only for subjects that have "chapters" in batches.json) ---------- */
 function chapBox(b, s, c, i) {
   const done = c.video_ids.filter(id => (store.get(pkey(b, s, id)) || {}).done).length;
   const pct = c.count ? Math.round(done / c.count * 100) : 0;
@@ -469,7 +481,7 @@ async function subjectPage(b, s, tok) {
   const subj = d.subjects.find(x => x.slug === s);
   const back = `#/b/${enc(b)}`;
   if (!subj) { $('main').innerHTML = topbar(back) + '<div class="empty">Subject not found.</div>'; return; }
-  if (!subj.has_chapters) return lecturesPage(b, s, tok, null);   // no chapters: straight to the lectures
+  if (!subj.has_chapters) return lecturesPage(b, s, tok, null);
 
   document.title = `${subj.name} – ${d.name} – JEEINGO`;
   crumbs([{label:'Home', href:'#/'}, {label:d.name, href:back}, {label:subj.name}]);
@@ -491,7 +503,62 @@ async function subjectPage(b, s, tok) {
   draw();
 }
 
-/* ---------- lectures grid (whole subject, or one chapter when c is given) ---------- */
+async function studyMaterialsPage(b, s, subpath, tok) {
+  let d;
+  try { d = await getDetail(b); } catch { if (tok === R) $('main').innerHTML = topbar('#/') + '<div class="empty">Batch not found.</div>'; return; }
+  if (tok !== R) return;
+  const subj = d.subjects.find(x => x.slug === s);
+  const back = `#/b/${enc(b)}`;
+  if (!subj) { $('main').innerHTML = topbar(back) + '<div class="empty">Subject not found.</div>'; return; }
+
+  document.title = `Study Material - ${subj.name} – ${d.name} – JEEINGO`;
+  crumbs([{label:'Home', href:'#/'}, {label:d.name, href:back}, {label:subj.name + ' PDFs'}]);
+  
+  $('main').innerHTML = topbar(back) + `
+    <div class="sechead"><div><h2>${esc(subj.name)} - Study Materials</h2><p>Access notes, DPPs and custom folders from local storage.</p></div></div>
+    <div class="pdf-viewer-container">
+      <div class="pdf-sidebar" id="pdf-sidebar">${skel(4)}</div>
+      <div class="pdf-main-view" id="pdf-main">
+        <div class="empty">Select a PDF from the sidebar to view it here.</div>
+      </div>
+    </div>`;
+
+  try {
+    const res = await api(`/api/batches/${enc(b)}/subjects/${enc(s)}/materials?subpath=${enc(subpath)}`);
+    if (tok !== R) return;
+    
+    let html = '';
+    if (subpath) {
+      const parentPath = subpath.split('/').slice(0, -1).join('/');
+      const parentHash = `#/b/${enc(b)}/materials/${enc(s)}${parentPath ? '/subpath/' + enc(parentPath) : ''}`;
+      html += `<div class="file-item" onclick="location.hash='${parentHash}'">${svg('back')}<span>Back to parent folder</span></div>`;
+    }
+    
+    if (!res.items.length) {
+      html += '<div class="empty" style="padding:20px;">No folders or PDFs found here.</div>';
+    } else {
+      res.items.forEach(item => {
+        if (item.is_dir) {
+          const dirHash = `#/b/${enc(b)}/materials/${enc(s)}/subpath/${enc(item.path)}`;
+          html += `<div class="file-item" onclick="location.hash='${dirHash}'">${svg('folder')}<span>${esc(item.name)}</span></div>`;
+        } else {
+          html += `<div class="file-item" onclick="loadPdf('${enc(b)}', '${enc(s)}', '${enc(item.path)}', this)">${svg('test')}<span>${esc(item.name)}</span></div>`;
+        }
+      });
+    }
+    $('pdf-sidebar').innerHTML = html;
+  } catch (err) {
+    if (tok === R) $('pdf-sidebar').innerHTML = '<div class="empty">No materials directory found for this subject. Please ensure the local folder exists and is configured correctly.</div>';
+  }
+}
+
+function loadPdf(b, s, filepath, el) {
+  document.querySelectorAll('.file-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const pdfUrl = `/api/batches/${b}/subjects/${s}/pdf?filepath=${filepath}`;
+  $('pdf-main').innerHTML = `<iframe class="pdf-iframe" src="${pdfUrl}"></iframe>`;
+}
+
 async function lecturesPage(b, s, tok, c) {
   let d;
   try { d = await getDetail(b); } catch { if (tok === R) $('main').innerHTML = topbar('#/') + '<div class="empty">Batch not found.</div>'; return; }
@@ -559,7 +626,6 @@ function lectureCard(b, s, v, i, c) {
   </a>`;
 }
 
-/* ---------- player + side playlist ---------- */
 async function watchPage(b, s, vid, tok, c = null) {
   if (W && W.b === b && W.s === s && W.c === c && $('v')) { playId(vid); return; }
   let d;
@@ -567,7 +633,7 @@ async function watchPage(b, s, vid, tok, c = null) {
   if (tok !== R) return;
   const subj = d.subjects.find(x => x.slug === s);
   const subjHref = `#/b/${enc(b)}/s/${enc(s)}`;
-  const back = c ? `${subjHref}/c/${enc(c)}` : subjHref;     // chapter lectures, or the subject page
+  const back = c ? `${subjHref}/c/${enc(c)}` : subjHref;
   if (!subj) { $('main').innerHTML = topbar(`#/b/${enc(b)}`) + '<div class="empty">Subject not found.</div>'; return; }
 
   $('main').innerHTML = topbar(back, false, 'Back to lectures') + '<div class="skel" style="height:420px"></div>';
@@ -580,7 +646,6 @@ async function watchPage(b, s, vid, tok, c = null) {
 
   if (c && chName) crumbs([{label:'Home', href:'#/'}, {label:d.name, href:`#/b/${enc(b)}`}, {label:subj.name, href:subjHref}, {label:chName, href:back}]);
   W = { b, s, c, list, cur:null, subj:subj.name, chName, base:back };
-  // No "Join Telegram" button on the player page, only Back.
   $('main').innerHTML = topbar(back, false, 'Back to lectures') + `
     <div class="watch">
       <div>
@@ -651,7 +716,6 @@ function play(v, autoplay = true) {
 }
 
 function playId(id) { const v = W.list.find(x => x.id === id); if (v) play(v); }
-
 function step(d) {
   const i = W.list.findIndex(x => W.cur && x.id === W.cur.id);
   const n = W.list[i + d];

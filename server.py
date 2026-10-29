@@ -10,25 +10,17 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response, StreamingResponse
-from telethon import TelegramClient, utils
+from telethon import TelegramClient
 from telethon.sessions import StringSession
-from telethon.tl.functions.channels import GetChannelsRequest
-from telethon.tl.types import InputChannel, InputPeerChat, PeerChannel
-
-from common import doc_name, make_video, norm
+from telethon.tl.types import InputMessagesFilterVideo, InputMessagesFilterDocument
 
 load_dotenv()
 
 API_ID = int(os.environ["API_ID"])
 API_HASH = os.environ["API_HASH"]
-SESSION_STRING = os.environ.get("SESSION_STRING", "")
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "").strip()
-BOT_MODE = bool(BOT_TOKEN)          # bot streams the videos; the list of lectures comes from index.json
-if not BOT_MODE and not SESSION_STRING:
-    raise SystemExit("Set BOT_TOKEN (recommended) or SESSION_STRING in .env")
+SESSION_STRING = os.environ["SESSION_STRING"]
 SITE_PASSWORD = os.environ.get("SITE_PASSWORD", "")  # empty = no login
-SECRET = os.environ.get("COOKIE_SECRET", (BOT_TOKEN or SESSION_STRING)[:32])
-INDEX_FILE = os.environ.get("INDEX_FILE", "index.json")
+SECRET = os.environ.get("COOKIE_SECRET", SESSION_STRING[:32])
 
 CHUNK = 1024 * 1024
 INDEX_TTL = 600  # seconds; new uploads appear within ~10 minutes (or use ?refresh=1)
@@ -44,9 +36,9 @@ for b in RAW:
     b["password"] = "" if b.get("password") in (None, "") else str(b["password"])   # optional per-batch password
     BATCHES[b["slug"]] = b
 
-client = TelegramClient("bot" if BOT_MODE else StringSession(SESSION_STRING), API_ID, API_HASH)
+client = TelegramClient(StringSession(SESSION_STRING), API_ID, API_HASH)
 entities: dict[str, object] = {}
-msg_cache: dict[tuple, tuple] = {}      # key -> (time, message)
+msg_cache: dict[tuple, object] = {}
 index_cache: dict[tuple, dict] = {}
 index_locks: dict[tuple, asyncio.Lock] = {}
 
@@ -56,36 +48,17 @@ def chan_of(batch: dict, subject: dict) -> str:
 
 
 async def resolve_channel(ch: str):
-    if ch in entities:
-        return entities[ch]
-    if BOT_MODE and re.fullmatch(r"-?\d+", ch):
-        # a bot has no dialog list, so ask Telegram for the channel directly (works once the bot is a member/admin)
-        real_id, peer = utils.resolve_id(int(ch))
-        if peer is PeerChannel:
-            res = await client(GetChannelsRequest([InputChannel(real_id, 0)]))
-            ent = res.chats[0]
-        else:
-            ent = InputPeerChat(real_id)
-    else:
-        ent = await client.get_entity(int(ch) if re.fullmatch(r"-?\d+", ch) else ch)
-    entities[ch] = ent
-    return ent
+    if ch not in entities:
+        entities[ch] = await client.get_entity(int(ch) if re.fullmatch(r"-?\d+", ch) else ch)
+    return entities[ch]
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if BOT_MODE:
-        await client.start(bot_token=BOT_TOKEN)
-    else:
-        await client.start()
+    await client.start()
     for b in BATCHES.values():
         for s in b["subjects"]:
-            try:
-                await resolve_channel(chan_of(b, s))
-            except Exception as e:
-                if not BOT_MODE:
-                    raise
-                print(f"WARNING: bot cannot open channel {chan_of(b, s)} ({e}). Is the bot added as admin there?")
+            await resolve_channel(chan_of(b, s))
     yield
     await client.disconnect()
 
@@ -131,6 +104,86 @@ async def logout(request: Request):
         if k.startswith("bk_"):
             r.delete_cookie(k)
     return r
+
+
+# ---------- caption parsing ----------
+_WORDS = r"(?:lecture|lect|lec|class|lesson|part|video|session|episode|ep|l)"
+TRAIL = re.compile(rf"[\s\-–—:|,.(\[#_]*\b{_WORDS}(?![A-Za-z])[\s.\-–—:#_]*(\d+)[\s)\]]*$", re.I)
+LEAD = re.compile(rf"^[\s\[(#]*\b{_WORDS}(?![A-Za-z])[\s.\-–—:#_]*(\d+)[\s)\]]*[\-–—:|,.\s_]+", re.I)
+STRIP = " -–—:|,._#[]()"
+
+
+def parse_caption(text: str | None, fname: str | None, line_n: int, custom):
+    """Returns (title, chapter, lecture_no)."""
+    lines = [l.strip() for l in (text or "").splitlines() if l.strip()]
+    if lines:
+        line = lines[line_n - 1] if 0 < line_n <= len(lines) else lines[0]
+    else:
+        line = re.sub(r"\.\w{2,4}$", "", fname or "")
+    line = re.sub(r"\s+", " ", line).strip()
+
+    chapter, lecture = None, None
+    if custom is not None:
+        mm = custom.search(line)
+        if mm:
+            gd = mm.groupdict()
+            chapter = (gd.get("chapter") or "").strip() or None
+            if (gd.get("lecture") or "").isdigit():
+                lecture = int(gd["lecture"])
+    if chapter is None:
+        mt = TRAIL.search(line)
+        if mt:
+            lecture, chapter = int(mt.group(1)), line[: mt.start()]
+        else:
+            ml = LEAD.match(line)
+            if ml:
+                lecture, chapter = int(ml.group(1)), line[ml.end():]
+            else:
+                chapter = line
+    chapter = chapter.strip(STRIP) or "Other"
+    return line, chapter, lecture
+
+
+VIDEO_EXT = (".mp4", ".mkv", ".webm", ".mov", ".m4v", ".avi", ".ts", ".3gp")
+
+
+def doc_name(doc) -> str:
+    for a in doc.attributes:
+        if getattr(a, "file_name", None):
+            return a.file_name
+    return ""
+
+
+def is_video_doc(doc) -> bool:
+    mt = (doc.mime_type or "").lower()
+    return mt.startswith("video/") or doc_name(doc).lower().endswith(VIDEO_EXT)
+
+
+def norm(s: str) -> str:
+    return re.sub(r"[^\w]+", " ", s.lower()).strip()
+
+
+def video_info(m, line_n, custom):
+    doc = m.document
+    fname, duration = None, None
+    for a in doc.attributes:
+        if getattr(a, "file_name", None):
+            fname = a.file_name
+        if hasattr(a, "duration"):
+            duration = int(a.duration)
+    title, chapter, lecture = parse_caption(m.message, fname, line_n, custom)
+    return {
+        "id": m.id,
+        "title": (title or f"Lecture {m.id}")[:160],
+        "chapter": chapter,
+        "lecture": lecture,
+        "size": doc.size,
+        "duration": duration,
+        "mime": doc.mime_type,
+        "date": m.date.isoformat(),
+        "raw": (m.message or "")[:300],
+        "hay": norm((m.message or "") + " " + (fname or "")),   # whole caption + file name, used for chapter matching
+    }
 
 
 # ---------- helpers ----------
@@ -203,25 +256,6 @@ def assign_chapter(v: dict, specs: list[dict]):
     return best
 
 
-_index_file = {"mtime": None, "items": {}}
-
-
-def load_index_file() -> dict:
-    try:
-        mt = os.path.getmtime(INDEX_FILE)
-    except OSError:
-        return {}
-    if mt != _index_file["mtime"]:
-        with open(INDEX_FILE, encoding="utf-8") as f:
-            _index_file.update(mtime=mt, items=json.load(f).get("items", {}))
-    return _index_file["items"]
-
-
-async def scan_channel(b: dict, s: dict) -> list[dict]:
-    from common import scan
-    return await scan(client, await resolve_channel(chan_of(b, s)), s)
-
-
 async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
     key = (bslug, sslug)
     c = index_cache.get(key)
@@ -234,6 +268,7 @@ async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
             return c
         b = get_batch(bslug)
         s = get_subject(b, sslug)
+        ent = await resolve_channel(chan_of(b, s))
         line_n = int(s.get("name_line") or b.get("name_line") or 1)
         pattern = s.get("chapter_regex") or b.get("chapter_regex")
         try:
@@ -241,12 +276,20 @@ async def get_index(bslug: str, sslug: str, refresh: bool = False) -> dict:
         except re.error:
             custom = None
 
-        if BOT_MODE:
-            # list of lectures was prepared by build_index.py (a bot cannot list/search a channel)
-            recs = load_index_file().get(f"{bslug}/{sslug}", [])
-            vids = [make_video(r, line_n, custom) for r in recs]
-        else:
-            vids = [make_video(r, line_n, custom) for r in await scan_channel(b, s)]
+        kwargs = dict(limit=None)
+        if s.get("search"):
+            kwargs["search"] = s["search"]
+        if s.get("topic_id"):
+            kwargs["reply_to"] = int(s["topic_id"])
+
+        # videos sent as "video" AND videos sent as "file/document" (e.g. abc.mp4)
+        vids, seen = [], set()
+        for flt in (InputMessagesFilterVideo, InputMessagesFilterDocument):
+            async for m in client.iter_messages(ent, filter=flt, **kwargs):
+                if not m.document or m.id in seen or not is_video_doc(m.document):
+                    continue
+                seen.add(m.id)
+                vids.append(video_info(m, line_n, custom))
         vids.sort(key=lambda v: v["id"])
 
         specs = chapter_specs(s)
@@ -276,18 +319,17 @@ def public(v: dict) -> dict:
 
 async def get_msg(bslug: str, sslug: str, msg_id: int):
     key = (bslug, sslug, msg_id)
-    hit = msg_cache.get(key)
-    if hit and time.time() - hit[0] < 1800:        # file references expire, so re-fetch every 30 min
-        return hit[1]
-    b = get_batch(bslug)
-    s = get_subject(b, sslug)
-    ent = await resolve_channel(chan_of(b, s))
-    m = await client.get_messages(ent, ids=msg_id)
-    if not m or not m.document:
-        raise HTTPException(404, "No media in that message")
-    if len(msg_cache) > 1000:
-        msg_cache.clear()
-    msg_cache[key] = (time.time(), m)
+    m = msg_cache.get(key)
+    if m is None:
+        b = get_batch(bslug)
+        s = get_subject(b, sslug)
+        ent = await resolve_channel(chan_of(b, s))
+        m = await client.get_messages(ent, ids=msg_id)
+        if not m or not m.document:
+            raise HTTPException(404, "No media in that message")
+        if len(msg_cache) > 1000:
+            msg_cache.clear()
+        msg_cache[key] = m
     return m
 
 
